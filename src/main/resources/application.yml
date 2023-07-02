@@ -1,0 +1,67 @@
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: postgres
+    password: alex21022001
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        hbm2ddl:
+          auto: validate
+    open-in-view: false
+  jackson:
+    date-format: java.text.SimpleDateFormat
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id:
+#            client-secret:
+#            redirect-uri: http://localhost:8080/login/oauth2/code/google
+#            scope: openid,email,profile
+  liquibase:
+    change-log: db.changelog/db.changelog-master.yaml
+#  mail:
+#    host: smtp.gmail.com
+#    port: 587
+#    username: alexeysitiy@gmail.com
+#    password: arqkmemdnnyabqge
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+#            required: true
+jwt:
+  token:
+    subject: "User details"
+    issuer: "Spring security test"
+    secret: "eyJhbGciOiJI"
+    longevity: 180
+  authentication:
+    login-process-uri: "/auth/login"
+
+aws:
+  access:
+    key:
+      id:
+  secret:
+    access:
+      key:
+  s3:
+    region: eu-central-1
+    bucket:
+      name: springimagebucket
+
+logging:
+  level:
+    root: info
+    com.alexsitiy.ideas.project: debug
+
+
