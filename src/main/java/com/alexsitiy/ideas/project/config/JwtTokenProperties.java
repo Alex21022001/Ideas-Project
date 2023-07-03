@@ -10,15 +10,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 public class JwtTokenProperties {
 
-    private final String subject = "User details";
+    private String subject = "User details";
 
-    private final String issuer = "Application name";
+    private String issuer = "Application name";
 
-    private final String secret = "Here should be secret key";
+    private String secret = "Here should be secret key";
 
     /**
      * set time in minutes
      */
-    private final Long longevity = 60L;
+    private Long longevity = 60L;
 
 }

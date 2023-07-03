@@ -4,7 +4,9 @@ import com.alexsitiy.ideas.project.repository.UserRepository;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+@Component
 @RequiredArgsConstructor
 public class EmailCheckValidator implements ConstraintValidator<EmailCheck, String> {
 

@@ -39,11 +39,10 @@ spring:
 #            enable: true
 #            required: true
 jwt:
-  token:
-    subject: "Username"
-    issuer: "Ideas project"
-    secret: "eyJhbGciOiJI"
-    longevity: 180
+  subject: "Username"
+  issuer: "Ideas project"
+  secret: "eyJhbGciOiJI"
+  longevity: 180
 
 
 aws:

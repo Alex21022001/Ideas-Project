@@ -8,6 +8,7 @@ import com.alexsitiy.ideas.project.security.AuthenticationResponse;
 import com.alexsitiy.ideas.project.security.RegisterRequest;
 import com.alexsitiy.ideas.project.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class AuthService {
 
     private final String JWT_TYPE = "Bearer ";
@@ -40,6 +42,7 @@ public class AuthService {
                 .build();
 
         User savedUser = userRepository.save(user);
+        log.debug("User {} was created", savedUser);
 
         String token = jwtUtil.generateToken(savedUser);
 
@@ -53,6 +56,7 @@ public class AuthService {
         var usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 request.getUsername(), request.getPassword());
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        log.debug("User {} was signed ip", authentication.getPrincipal());
 
         String token = jwtUtil.generateToken((User) authentication.getPrincipal());
 
