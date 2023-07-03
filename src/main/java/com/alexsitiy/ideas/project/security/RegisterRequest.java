@@ -8,12 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class RegisterRequest {
-    @NotNull
     @NotBlank
     @Size(min = 2)
     private String firstname;
 
-    @NotNull
     @NotBlank
     @Size(min = 2)
     private String lastname;
@@ -22,7 +20,6 @@ public class RegisterRequest {
     @EmailCheck
     private String username;
 
-    @NotNull
     @NotBlank
     @Min(3)
     private String password;
