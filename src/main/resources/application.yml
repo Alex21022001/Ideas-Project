@@ -40,12 +40,11 @@ spring:
 #            required: true
 jwt:
   token:
-    subject: "User details"
-    issuer: "Spring security test"
+    subject: "Username"
+    issuer: "Ideas project"
     secret: "eyJhbGciOiJI"
     longevity: 180
-  authentication:
-    login-process-uri: "/auth/login"
+
 
 aws:
   access:
