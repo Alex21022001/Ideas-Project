@@ -6,6 +6,7 @@ import com.alexsitiy.ideas.project.repository.UserRepository;
 import com.alexsitiy.ideas.project.security.AuthenticationRequest;
 import com.alexsitiy.ideas.project.security.AuthenticationResponse;
 import com.alexsitiy.ideas.project.security.RegisterRequest;
+import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,7 @@ public class AuthService {
         User savedUser = userRepository.save(user);
         log.debug("User {} was created", savedUser);
 
-        String token = jwtUtil.generateToken(savedUser);
+        String token = jwtUtil.generateToken(SecurityUser.of(savedUser));
 
         return AuthenticationResponse.builder()
                 .token(token)
@@ -58,7 +59,7 @@ public class AuthService {
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
         log.debug("User {} was signed ip", authentication.getPrincipal());
 
-        String token = jwtUtil.generateToken((User) authentication.getPrincipal());
+        String token = jwtUtil.generateToken((SecurityUser) authentication.getPrincipal());
 
         return AuthenticationResponse.builder()
                 .token(token)

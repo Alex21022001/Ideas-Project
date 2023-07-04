@@ -1,13 +1,14 @@
 package com.alexsitiy.ideas.project.util;
 
 import com.alexsitiy.ideas.project.config.JwtTokenProperties;
-import com.alexsitiy.ideas.project.entity.User;
+import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -21,7 +22,7 @@ public class JwtTokenUtil {
 
     private final JwtTokenProperties jwtProperties;
 
-    public String generateToken(User user) {
+    public String generateToken(SecurityUser user) {
         return JWT.create()
                 .withSubject(jwtProperties.getSubject())
                 .withClaim(CLAIM_USERNAME, user.getUsername())

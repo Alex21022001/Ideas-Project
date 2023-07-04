@@ -31,7 +31,6 @@ public class AuthRestController {
     }
 
 
-
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException badCredentialsException) {
         return ResponseEntity.badRequest().body(badCredentialsException.getLocalizedMessage());

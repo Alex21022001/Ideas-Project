@@ -3,13 +3,16 @@ package com.alexsitiy.ideas.project.service;
 import com.alexsitiy.ideas.project.dto.UserReadDto;
 import com.alexsitiy.ideas.project.mapper.UserReadMapper;
 import com.alexsitiy.ideas.project.repository.UserRepository;
+import com.alexsitiy.ideas.project.security.SecurityUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -29,6 +32,7 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
+                .map(SecurityUser::of)
                 .orElseThrow(() -> new UsernameNotFoundException("There is no user with username:" + username));
     }
 }
