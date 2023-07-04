@@ -1,15 +1,14 @@
 package com.alexsitiy.ideas.project.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -17,6 +16,8 @@ import java.util.Collections;
 @NoArgsConstructor
 @Data
 @Builder
+@ToString(exclude = {"projects"})
+@EqualsAndHashCode(exclude = {"projects"})
 public class User {
 
     @Id
@@ -39,4 +40,12 @@ public class User {
     @Column(name = "password",nullable = false)
     private String password;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY,orphanRemoval = true,cascade = CascadeType.PERSIST)
+    private List<Project> projects = new ArrayList<>();
+
+    public void addProject(Project project){
+        projects.add(project);
+        project.setUser(this);
+    }
 }
