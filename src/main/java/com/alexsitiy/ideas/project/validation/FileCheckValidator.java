@@ -39,7 +39,7 @@ public class FileCheckValidator implements ConstraintValidator<FileCheck, Multip
     }
 
     private boolean checkContentType(String contentType) {
-        return Arrays.stream(allowContentTypes).anyMatch(s -> s.equals(contentType));
+        return Arrays.asList(allowContentTypes).contains(contentType);
     }
 }
 
