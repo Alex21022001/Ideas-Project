@@ -62,6 +62,6 @@ public class ProjectService {
         // 2) check existence
         // 3) add to S3
         // 4) set generated paths
-        return Optional.empty();
+        return Optional.ofNullable(file.getName());
     }
 }

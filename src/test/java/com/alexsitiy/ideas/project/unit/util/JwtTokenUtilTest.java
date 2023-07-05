@@ -1,8 +1,9 @@
-package com.alexsitiy.ideas.project.util;
+package com.alexsitiy.ideas.project.unit.util;
 
 import com.alexsitiy.ideas.project.config.JwtTokenProperties;
 import com.alexsitiy.ideas.project.entity.Role;
 import com.alexsitiy.ideas.project.security.SecurityUser;
+import com.alexsitiy.ideas.project.util.JwtTokenUtil;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
