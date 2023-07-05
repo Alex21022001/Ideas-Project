@@ -3,11 +3,13 @@ package com.alexsitiy.ideas.project.service;
 import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.entity.Project;
+import com.alexsitiy.ideas.project.exception.UploadingFileException;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectReadMapper;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +19,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
@@ -36,19 +39,29 @@ public class ProjectService {
                     //  6) Add project to user
                     //  7) Save User + Project
                     Project project = projectCreateMapper.map(projectDto);
-                    uploadFile(projectDto.getImage(), project);
-                    uploadFile(projectDto.getDocs(), project);
+
+                    Optional<String> imagePath = uploadFile(projectDto.getImage());
+                    imagePath.ifPresentOrElse(project::setImagePath, () -> {
+                        log.warn("Couldn't upload file {} to S3", projectDto.getImage().getOriginalFilename());
+                        throw new UploadingFileException("Couldn't load file: " + projectDto.getImage().getOriginalFilename());
+                    });
+
+                    Optional<String> docsPath = uploadFile(projectDto.getDocs());
+                    docsPath.ifPresent(project::setDocsPath);
+
                     user.addProject(project);
                     userRepository.saveAndFlush(user);
+                    log.debug("Project {} was created",project);
                     return project;
                 })
                 .map(projectReadMapper::map);
     }
 
-    private void uploadFile(MultipartFile file, Project project) {
+    private Optional<String> uploadFile(MultipartFile file) {
         // TODO: 04.07.2023 S3 upload method
         // 2) check existence
         // 3) add to S3
         // 4) set generated paths
+        return Optional.empty();
     }
 }
