@@ -48,14 +48,15 @@ jwt:
 aws:
   access:
     key:
-      id:
+      id: AKIATAVZMCPH4DPJRWQP
   secret:
     access:
-      key:
+      key: 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
   s3:
     region: eu-central-1
     bucket:
       name: springimagebucket
+    projects-url: projects/
 
 logging:
   level:

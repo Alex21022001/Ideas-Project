@@ -3,6 +3,7 @@ package com.alexsitiy.ideas.project.security;
 import com.alexsitiy.ideas.project.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -11,6 +12,7 @@ import java.util.Collections;
 
 @AllArgsConstructor
 @Data
+@ToString(exclude = {"password"})
 public class SecurityUser implements UserDetails {
 
     private Integer id;

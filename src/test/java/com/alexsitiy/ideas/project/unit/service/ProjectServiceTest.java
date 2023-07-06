@@ -13,6 +13,7 @@ import com.alexsitiy.ideas.project.mapper.UserReadMapper;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.repository.UserRepository;
 import com.alexsitiy.ideas.project.service.ProjectService;
+import com.alexsitiy.ideas.project.service.S3Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,6 +43,8 @@ class ProjectServiceTest {
     private ProjectRepository projectRepository;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private S3Service s3Service;
 
     @Spy
     private ProjectCreateMapper projectCreateMapper;
@@ -65,13 +68,14 @@ class ProjectServiceTest {
         ProjectCreateDto projectDto = new ProjectCreateDto(
                 projectTitle,
                 "something",
-                new MockMultipartFile("image", "project.png", "image/png", new byte[0]),
-                new MockMultipartFile("doc", "project.pdf", "application/pdf", new byte[0])
+                new MockMultipartFile("image", "project.png", "image/png", new byte[123]),
+                new MockMultipartFile("doc", "project.pdf", "application/pdf", new byte[123])
         );
         ProjectReadDto projectRead = ProjectReadDto.builder()
                 .id(4).build();
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
+        doReturn(Optional.of("filePath")).when(s3Service).upload(any(),any());
         doReturn(projectRead).when(projectReadMapper).map(any());
 
         Optional<ProjectReadDto> actual = projectService.create(projectDto, userId);
@@ -80,6 +84,6 @@ class ProjectServiceTest {
                 .map(ProjectReadDto::getId)
                 .get()
                 .isEqualTo(4);
-        verify(userRepository,times(1)).saveAndFlush(any());
+        verify(projectRepository,times(1)).save(any());
     }
 }

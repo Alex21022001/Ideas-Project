@@ -15,7 +15,7 @@ public @interface FileCheck {
 
     boolean nullable() default true;
 
-    long maxSize() default 512 * 512;
+    long maxSize() default 500000;
 
     String[] contentType();
 

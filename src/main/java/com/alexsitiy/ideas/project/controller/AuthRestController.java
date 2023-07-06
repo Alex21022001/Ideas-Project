@@ -1,6 +1,7 @@
 package com.alexsitiy.ideas.project.controller;
 
-import com.alexsitiy.ideas.project.dto.ErrorMessage;
+import com.alexsitiy.ideas.project.dto.error.ErrorMessage;
+import com.alexsitiy.ideas.project.dto.error.ErrorType;
 import com.alexsitiy.ideas.project.security.AuthenticationRequest;
 import com.alexsitiy.ideas.project.security.RegisterRequest;
 import com.alexsitiy.ideas.project.security.AuthenticationResponse;
@@ -34,7 +35,7 @@ public class AuthRestController {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException badCredentialsException) {
-        return ResponseEntity.badRequest().body(new ErrorMessage(badCredentialsException.getLocalizedMessage()));
+        return ResponseEntity.badRequest().body(new ErrorMessage(badCredentialsException.getLocalizedMessage(), ErrorType.BAD_CREDENTIALS));
     }
 }
 

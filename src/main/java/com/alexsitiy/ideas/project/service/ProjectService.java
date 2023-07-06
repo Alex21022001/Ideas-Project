@@ -22,12 +22,14 @@ import java.util.Optional;
 @Slf4j
 public class ProjectService {
 
+    private final S3Service s3Service;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
 
     private final ProjectCreateMapper projectCreateMapper;
     private final ProjectReadMapper projectReadMapper;
 
+    @Transactional
     public Optional<ProjectReadDto> create(ProjectCreateDto projectDto, Integer userId) {
         return userRepository.findById(userId)
                 .map(user -> {
@@ -40,28 +42,25 @@ public class ProjectService {
                     //  7) Save User + Project
                     Project project = projectCreateMapper.map(projectDto);
 
-                    Optional<String> imagePath = uploadFile(projectDto.getImage());
-                    imagePath.ifPresentOrElse(project::setImagePath, () -> {
-                        log.warn("Couldn't upload file {} to S3", projectDto.getImage().getOriginalFilename());
-                        throw new UploadingFileException("Couldn't load file: " + projectDto.getImage().getOriginalFilename());
-                    });
+                    uploadFile(projectDto.getImage())
+                            .ifPresent(project::setImagePath);
 
-                    Optional<String> docsPath = uploadFile(projectDto.getDocs());
-                    docsPath.ifPresent(project::setDocsPath);
+                    uploadFile(projectDto.getDocs())
+                            .ifPresent(project::setDocsPath);
 
                     user.addProject(project);
-                    userRepository.saveAndFlush(user);
-                    log.debug("Project {} was created",project);
+                    projectRepository.save(project);
+                    log.debug("Project {} was created", project);
                     return project;
                 })
                 .map(projectReadMapper::map);
     }
 
     private Optional<String> uploadFile(MultipartFile file) {
-        // TODO: 04.07.2023 S3 upload method
-        // 2) check existence
-        // 3) add to S3
-        // 4) set generated paths
-        return Optional.ofNullable(file.getName());
+        if (file.isEmpty())
+            return Optional.empty();
+        else {
+            return s3Service.upload(file, Project.class);
+        }
     }
 }
