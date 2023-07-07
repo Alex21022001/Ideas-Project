@@ -64,7 +64,7 @@ public class ProjectService {
     }
 
     private Optional<String> uploadFile(MultipartFile file) {
-        if (file.isEmpty())
+        if (file == null || file.isEmpty())
             return Optional.empty();
         else {
             return s3Service.upload(file, Project.class);

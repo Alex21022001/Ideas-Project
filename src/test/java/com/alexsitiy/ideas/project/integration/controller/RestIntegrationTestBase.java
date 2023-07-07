@@ -6,9 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 
 @AutoConfigureMockMvc
-@WithMockUser(username = "test1@gmail.com",password = "123",authorities = "USER")
+@WithUserDetails(value = "test1@gmail.com",userDetailsServiceBeanName = "userService")
 public class RestIntegrationTestBase extends IntegrationTestBase {
 
     private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();

@@ -33,8 +33,7 @@ import static org.mockito.Mockito.doReturn;
 class ProjectServiceTest extends IntegrationTestBase {
 
     private final ProjectService projectService;
-    @SpyBean
-    private S3Service s3Service;
+    private final S3Service s3Service;
 
     @Test
     void create() {

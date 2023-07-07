@@ -24,9 +24,12 @@ public class FileCheckValidator implements ConstraintValidator<FileCheck, Multip
     @Override
     public boolean isValid(MultipartFile value, ConstraintValidatorContext context) {
         if (!nullable) {
-            return !value.isEmpty() && checkSizeAndType(value) && value.getOriginalFilename() != null;
+            return value != null &&
+                   !value.isEmpty() &&
+                   value.getOriginalFilename() != null &&
+                   checkSizeAndType(value);
         } else {
-            if (value.isEmpty()) {
+            if (value == null || value.isEmpty()) {
                 return true;
             } else {
                 return checkSizeAndType(value);
