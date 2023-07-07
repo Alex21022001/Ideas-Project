@@ -63,6 +63,13 @@ public class ProjectService {
                 .map(projectReadMapper::map);
     }
 
+    @Transactional
+    public void updateImage(Integer id, MultipartFile file) {
+        projectRepository.findById(id)
+                .ifPresent(project -> uploadFile(file)
+                        .ifPresent(project::setImagePath));
+    }
+
     private Optional<String> uploadFile(MultipartFile file) {
         if (file == null || file.isEmpty())
             return Optional.empty();
