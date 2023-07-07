@@ -66,11 +66,6 @@ public class ProjectsRestController {
                                        @FileCheck(nullable = false, contentType = {"application/pdf"})
                                        MultipartFile file) {
 
-        // TODO: 07.07.2023
-        //  1) Validate user
-        //  2) Validate File
-        //  3) Update project
-        //  4) return project
         projectService.updateDoc(id, file);
         return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
     }

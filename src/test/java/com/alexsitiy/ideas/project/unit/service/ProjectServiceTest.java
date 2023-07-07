@@ -5,6 +5,7 @@ import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.entity.Role;
+import com.alexsitiy.ideas.project.entity.Status;
 import com.alexsitiy.ideas.project.entity.User;
 import com.alexsitiy.ideas.project.integration.annotation.IT;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
@@ -17,9 +18,7 @@ import com.alexsitiy.ideas.project.service.S3Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -45,11 +44,13 @@ class ProjectServiceTest {
     private UserRepository userRepository;
     @Mock
     private S3Service s3Service;
-
     @Spy
     private ProjectCreateMapper projectCreateMapper;
     @Mock
     private ProjectReadMapper projectReadMapper;
+
+    @Captor
+    private ArgumentCaptor<Project> projectCaptor;
 
 
     @Test
@@ -95,9 +96,7 @@ class ProjectServiceTest {
         String description = "Something";
 
         ProjectUpdateDto updateDto = new ProjectUpdateDto(title, description);
-        Project project = Project.builder()
-                .id(projectId)
-                .build();
+        Project project = getProject(projectId);
 
         doReturn(Optional.of(project)).when(projectRepository).findByIdWithUser(projectId);
         doReturn(Project.builder()
@@ -118,7 +117,66 @@ class ProjectServiceTest {
                 .hasFieldOrPropertyWithValue("title", title)
                 .hasFieldOrPropertyWithValue("id", projectId)
                 .hasFieldOrPropertyWithValue("description", description);
-        verify(projectRepository,times(1)).saveAndFlush(project);
+        verify(projectRepository, times(1)).saveAndFlush(project);
+    }
+
+    @Test
+    void updateImage() {
+        int projectId = 1;
+        MockMultipartFile image = new MockMultipartFile(
+                "image",
+                "new-image.png",
+                "image/png", new byte[123]);
+        String newImagePath = "newImagePath";
+        Project project = getProject(projectId);
+
+        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+        doReturn(Optional.of(newImagePath)).when(s3Service).upload(image, Project.class);
+
+        projectService.updateImage(1, image);
+
+        verify(s3Service, times(1)).upload(image, Project.class);
+        verify(projectRepository, times(1)).saveAndFlush(projectCaptor.capture());
+        Project actual = projectCaptor.getValue();
+        assertThat(actual).isNotNull()
+                .hasFieldOrPropertyWithValue("id", projectId)
+                .hasFieldOrPropertyWithValue("imagePath", newImagePath);
+    }
+
+
+    @Test
+    void updateDoc() {
+        int projectId = 1;
+        MockMultipartFile doc = new MockMultipartFile(
+                "doc",
+                "new-doc.pdf",
+                "application/pdf", new byte[123]);
+        String newDocPath = "newDocPath";
+        Project project = getProject(projectId);
+
+        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+        doReturn(Optional.of(newDocPath)).when(s3Service).upload(doc, Project.class);
+
+        projectService.updateDoc(1, doc);
+
+        verify(s3Service, times(1)).upload(doc, Project.class);
+        verify(projectRepository, times(1)).saveAndFlush(projectCaptor.capture());
+        Project actual = projectCaptor.getValue();
+        assertThat(actual).isNotNull()
+                .hasFieldOrPropertyWithValue("id", projectId)
+                .hasFieldOrPropertyWithValue("docsPath", newDocPath);
+    }
+
+
+    private Project getProject(int projectId) {
+        return Project.builder()
+                .id(projectId)
+                .title("test1")
+                .description("test1-description")
+                .imagePath("test1.png")
+                .docsPath("test1.pdf")
+                .status(Status.WAITING)
+                .build();
     }
 }
 
