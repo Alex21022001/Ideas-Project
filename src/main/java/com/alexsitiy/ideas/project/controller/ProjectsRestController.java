@@ -10,6 +10,7 @@ import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.validation.FileCheck;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +29,20 @@ import java.util.Optional;
 public class ProjectsRestController {
 
     private final ProjectService projectService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProjectReadDto> findById(@PathVariable Integer id) {
+        return projectService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(ResponseEntity.notFound()::build);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> findAll(){
+
+
+        return null;
+    }
 
     @PostMapping
     public ResponseEntity<ProjectReadDto> create(@Validated ProjectCreateDto projectCreateDto,

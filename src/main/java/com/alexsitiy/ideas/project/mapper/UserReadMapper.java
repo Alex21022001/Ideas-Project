@@ -14,8 +14,6 @@ public class UserReadMapper implements Mapper<User, UserReadDto> {
                 .id(object.getId())
                 .firstname(object.getFirstname())
                 .lastname(object.getLastname())
-                .username(object.getUsername())
-                .role(object.getRole())
                 .build();
     }
 }

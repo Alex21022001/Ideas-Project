@@ -104,4 +104,9 @@ public class ProjectService {
             return s3Service.upload(file, Project.class);
         }
     }
+
+    public Optional<ProjectReadDto> findById(Integer id) {
+        return projectRepository.findByIdWithUser(id)
+                .map(projectReadMapper::map);
+    }
 }
