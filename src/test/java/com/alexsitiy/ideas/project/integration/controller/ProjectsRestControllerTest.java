@@ -4,9 +4,11 @@ import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.entity.Role;
+import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.core.Is;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
@@ -42,11 +45,11 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     private final MockMvc mockMvc;
     private final S3Service s3Service;
+    private final ProjectRepository projectRepository;
 
     @Test
     void create() throws Exception {
-        MockMultipartFile imageFile = new MockMultipartFile("image",
-                "some-image.png", "image/png", new byte[123]);
+        MockMultipartFile imageFile = getImage();
 
         doReturn(Optional.of("newPath")).when(s3Service).upload(any(), eq(Project.class));
 
@@ -81,7 +84,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                 )
                 .andExpect(status().isBadRequest())
                 .andExpectAll(
-                        jsonPath("violations",hasSize(2))
+                        jsonPath("violations", hasSize(2))
                 );
     }
 
@@ -123,9 +126,101 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                 .andExpect(jsonPath("$.violations", hasSize(3)));
     }
 
+    @Test
+    void updateImage() throws Exception {
+        int projectId = 1;
+        String newImagePath = "newImagePth";
+        MockMultipartFile image = getImage();
+
+        doReturn(Optional.of(newImagePath)).when(s3Service).upload(image, Project.class);
+
+        mockMvc.perform(multipart("/api/v1/projects/{id}/image", projectId)
+                        .file(image)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        })
+                )
+                .andExpect(status().is(205));
+
+        Optional<Project> actual = projectRepository.findById(projectId);
+        assertThat(actual).isPresent()
+                .map(Project::getImagePath)
+                .get().isEqualTo(newImagePath);
+
+    }
+
+    @Test
+    void updateInvalidImage() throws Exception {
+        int projectId = 1;
+        MockMultipartFile image = new MockMultipartFile("image", "image-gif.gif", "image/gif", new byte[]{});
+
+        mockMvc.perform(multipart("/api/v1/projects/{id}/image", projectId)
+                        .file(image)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        })
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateDoc() throws Exception {
+        int projectId = 1;
+        String newDocPath = "newDocPath";
+        MockMultipartFile docFile = getDocFile();
+
+        doReturn(Optional.of(newDocPath)).when(s3Service).upload(docFile, Project.class);
+
+        mockMvc.perform(multipart("/api/v1/projects/{id}/doc", projectId)
+                        .file(docFile)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        })
+                )
+                .andExpect(status().is(205));
+
+        Optional<Project> actual = projectRepository.findById(projectId);
+        assertThat(actual).isPresent()
+                .map(Project::getDocsPath)
+                .get().isEqualTo(newDocPath);
+    }
+
+    @Test
+    void updateInvalidDoc() throws Exception {
+        int projectId = 1;
+        MockMultipartFile image = new MockMultipartFile("doc", "doc-gif.gif", "image/gif", new byte[]{});
+
+        mockMvc.perform(multipart("/api/v1/projects/{id}/doc", projectId)
+                        .file(image)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .with(request -> {
+                            request.setMethod("PUT");
+                            return request;
+                        })
+                )
+                .andExpect(status().isBadRequest());
+    }
+
+    @NotNull
+    private MockMultipartFile getDocFile() {
+        return new MockMultipartFile("doc", "new-doc-file.pdf", "application/pdf", new byte[123]);
+    }
+
     @NotNull
     private SecurityUser getUserDetails() {
         return new SecurityUser(1, "test1@gmail.com", null, Collections.singleton(Role.USER));
+    }
+
+    @NotNull
+    private MockMultipartFile getImage() {
+        return new MockMultipartFile("image",
+                "some-image.png", "image/png", new byte[123]);
     }
 
 
