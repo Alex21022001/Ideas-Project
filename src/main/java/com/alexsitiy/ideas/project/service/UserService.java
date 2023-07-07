@@ -1,6 +1,9 @@
 package com.alexsitiy.ideas.project.service;
 
+import com.alexsitiy.ideas.project.dto.UserFullReadDto;
 import com.alexsitiy.ideas.project.dto.UserReadDto;
+import com.alexsitiy.ideas.project.mapper.Mapper;
+import com.alexsitiy.ideas.project.mapper.UserFullReadMapper;
 import com.alexsitiy.ideas.project.mapper.UserReadMapper;
 import com.alexsitiy.ideas.project.repository.UserRepository;
 import com.alexsitiy.ideas.project.security.SecurityUser;
@@ -23,8 +26,9 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     private final UserReadMapper userReadMapper;
+    private final UserFullReadMapper userFullReadMapper;
 
-    public Optional<UserReadDto> findByUsername(String username){
+    public Optional<UserReadDto> findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .map(userReadMapper::map);
     }
@@ -34,5 +38,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username)
                 .map(SecurityUser::of)
                 .orElseThrow(() -> new UsernameNotFoundException("There is no user with username:" + username));
+    }
+
+    public Optional<UserFullReadDto> findById(Integer id) {
+        return userRepository.findById(id)
+                .map(userFullReadMapper::map);
     }
 }

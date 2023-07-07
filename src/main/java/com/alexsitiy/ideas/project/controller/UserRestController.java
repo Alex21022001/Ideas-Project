@@ -1,6 +1,8 @@
 package com.alexsitiy.ideas.project.controller;
 
+import com.alexsitiy.ideas.project.dto.UserFullReadDto;
 import com.alexsitiy.ideas.project.dto.UserReadDto;
+import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +20,8 @@ public class UserRestController {
     private final UserService userService;
 
     @GetMapping("/current")
-    public ResponseEntity<UserReadDto> getAuthUser(@AuthenticationPrincipal UserDetails userDetails){
-        return userService.findByUsername(userDetails.getUsername())
+    public ResponseEntity<UserFullReadDto> getAuthUser(@AuthenticationPrincipal SecurityUser user){
+        return userService.findById(user.getId())
                 .map(ResponseEntity::ok)
                 .orElseGet(ResponseEntity.badRequest()::build);
     }
