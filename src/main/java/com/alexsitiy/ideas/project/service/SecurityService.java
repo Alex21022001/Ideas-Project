@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 package com.alexsitiy.ideas.project.service;
 
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
@@ -22,7 +21,4 @@ public class SecurityService {
                 .filter(project -> project.getUser().getId().equals(user.getId()))
                 .isPresent();
     }
-=======
-package com.alexsitiy.ideas.project.service;public class SecurityService {
->>>>>>> Stashed changes
 }

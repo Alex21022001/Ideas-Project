@@ -2,6 +2,7 @@ package com.alexsitiy.ideas.project.integration.service;
 
 import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
+import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.dto.UserReadDto;
 import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.integration.IntegrationTestBase;
@@ -48,9 +49,24 @@ class ProjectServiceTest extends IntegrationTestBase {
         assertThat(actual).isPresent()
                 .get()
                 .hasFieldOrPropertyWithValue("id", 4)
-                .hasFieldOrPropertyWithValue("image",imagePath)
+                .hasFieldOrPropertyWithValue("image", imagePath)
                 .extracting("creator", as(InstanceOfAssertFactories.type(UserReadDto.class)))
                 .isNotNull().hasFieldOrPropertyWithValue("id", userId);
+    }
+
+    @Test
+    void update() {
+        int projectId = 1;
+        String title = "New title";
+        String description = "Something";
+
+        Optional<ProjectReadDto> actual = projectService.update(projectId, new ProjectUpdateDto(title, description));
+
+        assertThat(actual).isPresent()
+                .get()
+                .hasFieldOrPropertyWithValue("id", projectId)
+                .hasFieldOrPropertyWithValue("title", title)
+                .hasFieldOrPropertyWithValue("description", description);
     }
 
     @NotNull
@@ -60,7 +76,4 @@ class ProjectServiceTest extends IntegrationTestBase {
                 new MockMultipartFile("empty", new byte[]{}));
     }
 
-    @Test
-    void update() {
-    }
 }
