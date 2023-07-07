@@ -167,6 +167,21 @@ class ProjectServiceTest {
                 .hasFieldOrPropertyWithValue("docsPath", newDocPath);
     }
 
+    @Test
+    void delete() {
+        int projectId = 1;
+        Project project = getProject(projectId);
+
+        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+
+        boolean actual = projectService.delete(projectId);
+
+        assertThat(actual).isTrue();
+        verify(projectRepository, times(1)).delete(projectCaptor.capture());
+        assertThat(projectCaptor.getValue())
+                .isEqualTo(project);
+    }
+
 
     private Project getProject(int projectId) {
         return Project.builder()

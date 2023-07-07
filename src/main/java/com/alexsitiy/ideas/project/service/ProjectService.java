@@ -85,6 +85,18 @@ public class ProjectService {
                         }));
     }
 
+    @Transactional
+    public boolean delete(Integer id) {
+        return projectRepository.findById(id)
+                .map(project -> {
+                    projectRepository.delete(project);
+                    projectRepository.flush();
+                    log.debug("Product:{} was deleted", project);
+                    return true;
+                })
+                .orElse(false);
+    }
+
     private Optional<String> uploadFile(MultipartFile file) {
         if (file == null || file.isEmpty())
             return Optional.empty();

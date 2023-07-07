@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Collections;
@@ -205,6 +206,14 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                         })
                 )
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void delete() throws Exception {
+        int projectId = 1;
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/projects/{id}",projectId))
+                .andExpect(status().isNoContent());
     }
 
     @NotNull

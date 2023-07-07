@@ -70,6 +70,17 @@ public class ProjectsRestController {
         return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
     }
 
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
+    public ResponseEntity<?> delete(@PathVariable("id") Integer id) {
+        // TODO: 07.07.2023
+        //  1) Verify user
+        //  2) Find by id
+        //  3) Delete
+
+        return projectService.delete(id) ?
+                ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
 
     @ExceptionHandler({UploadingFileException.class})
     public ResponseEntity<FileErrorResponse> handleUploadingFileException(UploadingFileException fileException) {
