@@ -55,12 +55,23 @@ public class ProjectsRestController {
                                          @FileCheck(nullable = false, contentType = {"image/png", "image/jpg"})
                                          MultipartFile file) {
 
+        projectService.updateImage(id, file);
+        return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
+    }
+
+    @PutMapping("/{id}/doc")
+    @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
+    public ResponseEntity<?> updateDoc(@PathVariable("id") Integer id,
+                                       @RequestParam("doc")
+                                       @FileCheck(nullable = false, contentType = {"application/pdf"})
+                                       MultipartFile file) {
+
         // TODO: 07.07.2023
         //  1) Validate user
         //  2) Validate File
         //  3) Update project
         //  4) return project
-        projectService.updateImage(id, file);
+        projectService.updateDoc(id, file);
         return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
     }
 

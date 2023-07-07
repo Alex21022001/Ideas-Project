@@ -68,6 +68,15 @@ public class ProjectService {
         projectRepository.findById(id)
                 .ifPresent(project -> uploadFile(file)
                         .ifPresent(project::setImagePath));
+        log.debug("Project with id={} was updated. Image was chanced to {}",id,file.getOriginalFilename());
+    }
+
+    @Transactional
+    public void updateDoc(Integer id, MultipartFile file) {
+        projectRepository.findById(id)
+                .ifPresent(project -> uploadFile(file)
+                        .ifPresent(project::setDocsPath));
+        log.debug("Project with id={} was updated. Doc was chanced to {}",id,file.getOriginalFilename());
     }
 
     private Optional<String> uploadFile(MultipartFile file) {
