@@ -42,8 +42,8 @@ class S3ServiceTest {
 
         Optional<String> expected = s3Service.upload(file, Project.class);
 
-        verify(s3Client,times(1)).putObject(any(PutObjectRequest.class),any(RequestBody.class));
         Assertions.assertThat(expected).isPresent()
                 .get().asString().contains(".png");
+        verify(s3Client,times(1)).putObject(any(PutObjectRequest.class),any(RequestBody.class));
     }
 }

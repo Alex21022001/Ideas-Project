@@ -30,11 +30,6 @@ public class S3Service {
     private final S3Client s3Client;
 
     public Optional<String> upload(MultipartFile file, Class<?> clazz) {
-        // TODO: 05.07.2023
-        //  1) Generate unique path
-        //  2) upload File to S3
-        //  3) Handle Exceptions during uploading
-        //  4) Return generated path if upload is success, Optional.empty() if not
         String uniqueName = generateUniqueName(file.getOriginalFilename());
         String path = buildPath(uniqueName, clazz);
 

@@ -2,6 +2,7 @@ package com.alexsitiy.ideas.project.unit.service;
 
 import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
+import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.dto.UserReadDto;
 import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.entity.Role;
@@ -75,7 +76,7 @@ class ProjectServiceTest {
                 .id(4).build();
 
         doReturn(Optional.of(user)).when(userRepository).findById(userId);
-        doReturn(Optional.of("filePath")).when(s3Service).upload(any(),any());
+        doReturn(Optional.of("filePath")).when(s3Service).upload(any(), any());
         doReturn(projectRead).when(projectReadMapper).map(any());
 
         Optional<ProjectReadDto> actual = projectService.create(projectDto, userId);
@@ -84,6 +85,51 @@ class ProjectServiceTest {
                 .map(ProjectReadDto::getId)
                 .get()
                 .isEqualTo(4);
-        verify(projectRepository,times(1)).save(any());
+        verify(projectRepository, times(1)).save(any());
+    }
+
+
+    @Test
+    void update() {
+        int projectId = 1;
+        String title = "New Project";
+        String description = "Something";
+
+        ProjectUpdateDto updateDto = new ProjectUpdateDto(title, description);
+        Project project = Project.builder()
+                .id(projectId)
+                .build();
+
+        doReturn(Optional.of(project)).when(projectRepository).findByIdWithUser(projectId);
+        doReturn(Project.builder()
+                .id(projectId)
+                .title(title)
+                .description(description)
+                .build()).when(projectRepository).saveAndFlush(project);
+        doReturn(ProjectReadDto.builder()
+                .id(projectId)
+                .title(title)
+                .description(description)
+                .build()).when(projectReadMapper).map(any());
+
+        Optional<ProjectReadDto> actual = projectService.update(projectId, updateDto);
+
+        assertThat(actual).isPresent()
+                .get()
+                .hasFieldOrPropertyWithValue("title", title)
+                .hasFieldOrPropertyWithValue("id", projectId)
+                .hasFieldOrPropertyWithValue("description", description);
+        verify(projectRepository,times(1)).saveAndFlush(project);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
