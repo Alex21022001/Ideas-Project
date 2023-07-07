@@ -3,7 +3,6 @@ package com.alexsitiy.ideas.project.unit.service;
 import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
-import com.alexsitiy.ideas.project.dto.UserReadDto;
 import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.entity.Role;
 import com.alexsitiy.ideas.project.entity.User;
