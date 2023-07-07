@@ -1,16 +1,22 @@
 package com.alexsitiy.ideas.project.service;
 
 import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
+import com.alexsitiy.ideas.project.dto.ProjectFilter;
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.entity.Project;
+import com.alexsitiy.ideas.project.entity.QProject;
 import com.alexsitiy.ideas.project.exception.UploadingFileException;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectReadMapper;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.repository.UserRepository;
+import com.alexsitiy.ideas.project.util.QPredicate;
+import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +36,23 @@ public class ProjectService {
 
     private final ProjectCreateMapper projectCreateMapper;
     private final ProjectReadMapper projectReadMapper;
+
+
+
+    public Page<ProjectReadDto> findAll(ProjectFilter filter, Pageable pageable) {
+        Predicate predicate = QPredicate.builder()
+                .add(filter.title(), QProject.project.title::containsIgnoreCase)
+                .add(filter.statuses(), QProject.project.status::in)
+                .buildAll();
+
+        return projectRepository.findAll(predicate,pageable)
+                .map(projectReadMapper::map);
+    }
+
+    public Optional<ProjectReadDto> findById(Integer id) {
+        return projectRepository.findByIdWithUser(id)
+                .map(projectReadMapper::map);
+    }
 
     @Transactional
     public Optional<ProjectReadDto> create(ProjectCreateDto projectDto, Integer userId) {
@@ -103,10 +126,5 @@ public class ProjectService {
         else {
             return s3Service.upload(file, Project.class);
         }
-    }
-
-    public Optional<ProjectReadDto> findById(Integer id) {
-        return projectRepository.findByIdWithUser(id)
-                .map(projectReadMapper::map);
     }
 }

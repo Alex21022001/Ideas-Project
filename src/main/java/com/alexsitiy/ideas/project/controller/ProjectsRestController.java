@@ -1,5 +1,6 @@
 package com.alexsitiy.ideas.project.controller;
 
+import com.alexsitiy.ideas.project.dto.ProjectFilter;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.dto.error.FileErrorResponse;
 import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
@@ -11,6 +12,7 @@ import com.alexsitiy.ideas.project.validation.FileCheck;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,10 +40,9 @@ public class ProjectsRestController {
     }
 
     @GetMapping
-    public ResponseEntity<?> findAll(){
+    public ResponseEntity<?> findAll(ProjectFilter filter, Pageable pageable) {
 
-
-        return null;
+        return ResponseEntity.ok(projectService.findAll(filter, pageable));
     }
 
     @PostMapping
