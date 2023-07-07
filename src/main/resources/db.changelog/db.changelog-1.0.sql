@@ -7,7 +7,7 @@ CREATE TABLE users
     firstname varchar(32)  NOT NULL,
     lastname  varchar(32)  NOT NULL,
     role      varchar(32)  NOT NULL,
-    username     varchar(64)  NOT NULL UNIQUE,
+    username  varchar(64)  NOT NULL UNIQUE,
     password  varchar(128) NOT NULL
 );
 
@@ -27,8 +27,8 @@ CREATE TABLE project
 CREATE TABLE user_comment
 (
     id           serial PRIMARY KEY,
-    user_id      int REFERENCES users (id)   NOT NULL,
-    project_id   int REFERENCES project (id) NOT NULL,
-    comment_type varchar(16)                 NOT NULL,
+    user_id      int REFERENCES users (id) on DELETE CASCADE   NOT NULL,
+    project_id   int REFERENCES project (id) on DELETE CASCADE NOT NULL,
+    comment_type varchar(16)                                   NOT NULL,
     UNIQUE (user_id, project_id)
 );
