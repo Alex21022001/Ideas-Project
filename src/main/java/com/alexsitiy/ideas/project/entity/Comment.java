@@ -25,6 +25,24 @@ public class Comment {
     private Project project;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "comment_type",nullable = false)
+    @Column(name = "comment_type", nullable = false)
     private CommentType type;
+
+    public static Comment of(Project project, User user, CommentType commentType) {
+        Comment comment = new Comment();
+        comment.setType(commentType);
+        comment.setUser(user);
+        comment.setProject(project);
+        return comment;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+        user.getComments().add(this);
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+        project.getComments().add(this);
+    }
 }

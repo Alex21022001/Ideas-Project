@@ -4,10 +4,13 @@ import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.dto.UserReadDto;
+import com.alexsitiy.ideas.project.entity.Comment;
 import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.integration.IntegrationTestBase;
+import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.service.S3Service;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -34,6 +37,9 @@ class ProjectServiceTest extends IntegrationTestBase {
 
     private final ProjectService projectService;
     private final S3Service s3Service;
+
+    private final ProjectRepository projectRepository;
+    private final EntityManager entityManager;
 
     @Test
     void create() {
@@ -66,6 +72,23 @@ class ProjectServiceTest extends IntegrationTestBase {
                 .hasFieldOrPropertyWithValue("id", projectId)
                 .hasFieldOrPropertyWithValue("title", title)
                 .hasFieldOrPropertyWithValue("description", description);
+    }
+
+    @Test
+    void likeProject() {
+        int projectId = 3;
+        int userId = 1;
+        boolean actual = projectService.likeProject(projectId, userId);
+
+        assertThat(actual).isTrue();
+
+        entityManager.clear();
+
+        Optional<Project> project = projectRepository.findById(projectId);
+        assertThat(project).isPresent()
+                .map(Project::getComments)
+                .isNotEmpty().get(InstanceOfAssertFactories.list(Comment.class))
+                .anyMatch(comment -> comment.getUser().getId().equals(userId));
     }
 
     @NotNull

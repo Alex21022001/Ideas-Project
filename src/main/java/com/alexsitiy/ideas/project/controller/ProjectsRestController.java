@@ -89,12 +89,29 @@ public class ProjectsRestController {
     @DeleteMapping("/{id}")
     @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
     public ResponseEntity<?> delete(@PathVariable("id") Integer id) {
-        // TODO: 07.07.2023
-        //  1) Verify user
-        //  2) Find by id
-        //  3) Delete
 
         return projectService.delete(id) ?
+                ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<?> likeProject(@PathVariable Integer id,
+                                  @AuthenticationPrincipal SecurityUser user) {
+
+        // TODO: 08.07.2023
+        //  1) Verify user whether he has already set like or not
+        //  2) Find Project By id
+        //  3) Create comment
+        //  4) Save comment
+        return projectService.likeProject(id, user.getId()) ?
+                ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/dislike")
+    public ResponseEntity<?> dislikeProject(@PathVariable Integer id,
+                                  @AuthenticationPrincipal SecurityUser user) {
+
+        return projectService.dislikeProject(id, user.getId()) ?
                 ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 

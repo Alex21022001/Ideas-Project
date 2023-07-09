@@ -16,7 +16,7 @@ public class SecurityService {
     @Transactional(readOnly = true)
     public boolean verifyUserForProject(Integer projectId, Authentication authentication) {
         SecurityUser user = (SecurityUser) authentication.getPrincipal();
-
+// TODO: 09.07.2023 handle if projects miss exception
         return projectRepository.findById(projectId)
                 .filter(project -> project.getUser().getId().equals(user.getId()))
                 .isPresent();

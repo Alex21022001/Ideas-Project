@@ -4,11 +4,10 @@ import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectFilter;
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
-import com.alexsitiy.ideas.project.entity.Project;
-import com.alexsitiy.ideas.project.entity.QProject;
-import com.alexsitiy.ideas.project.exception.UploadingFileException;
+import com.alexsitiy.ideas.project.entity.*;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectReadMapper;
+import com.alexsitiy.ideas.project.repository.CommentRepository;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.repository.UserRepository;
 import com.alexsitiy.ideas.project.util.QPredicate;
@@ -17,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,10 +31,10 @@ public class ProjectService {
     private final S3Service s3Service;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     private final ProjectCreateMapper projectCreateMapper;
     private final ProjectReadMapper projectReadMapper;
-
 
 
     public Page<ProjectReadDto> findAll(ProjectFilter filter, Pageable pageable) {
@@ -45,7 +43,7 @@ public class ProjectService {
                 .add(filter.statuses(), QProject.project.status::in)
                 .buildAll();
 
-        return projectRepository.findAll(predicate,pageable)
+        return projectRepository.findAll(predicate, pageable)
                 .map(projectReadMapper::map);
     }
 
@@ -120,6 +118,55 @@ public class ProjectService {
                 .orElse(false);
     }
 
+    @Transactional
+    public boolean likeProject(Integer id, Integer userId) {
+        return comment(id, userId, CommentType.LIKE);
+    }
+
+    @Transactional
+    public boolean dislikeProject(Integer id, Integer userId) {
+        return comment(id, userId, CommentType.DISLIKE);
+    }
+
+    private boolean comment(Integer projectId, Integer userId, CommentType commentType) {
+        // TODO: 08.07.2023
+        //  1) Find Project by Id
+        //  2) Find User by Id
+        //  3) Create HQL request that checks whether comment for such a Project and User exists or not
+        //  4) Return Optional<Comment> maybeComment
+        //  5) Check maybeComment if It exists such User has already commented on it if not - Create new Comment
+        //  6) Check CommentType for this comment
+        //  7) If it is the same as requested one -> Delete Comment
+        //  8) If it's not -> change it to the other one
+        return projectRepository.findById(projectId)
+                .map(project -> {
+                    commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
+                            .ifPresentOrElse(comment -> {
+                                // TODO: 09.07.2023 check type if the same -> delete if not -> update type
+                                if (comment.getType().equals(commentType)) {
+                                    commentRepository.delete(comment);
+                                    commentRepository.flush();
+                                    log.debug("Comment: {} was deleted", comment);
+                                } else {
+                                    comment.setType(commentType);
+                                    commentRepository.saveAndFlush(comment);
+                                    log.debug("Comment: {} was updated. CommentType was changed to {}", comment, commentType);
+                                }
+
+                            }, () -> {
+                                // TODO: 09.07.2023 create a new comment
+                                Comment comment = new Comment();
+                                comment.setProject(project);
+                                comment.setUser(userRepository.getReferenceById(userId));
+                                comment.setType(commentType);
+                                commentRepository.save(comment);
+                                log.debug("User with ID: {} {}ED Project: {}", userId, commentType, project);
+                            });
+                    return true;
+                })
+                .orElse(false);
+    }
+
     private Optional<String> uploadFile(MultipartFile file) {
         if (file == null || file.isEmpty())
             return Optional.empty();
@@ -128,3 +175,17 @@ public class ProjectService {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
