@@ -129,20 +129,10 @@ public class ProjectService {
     }
 
     private boolean comment(Integer projectId, Integer userId, CommentType commentType) {
-        // TODO: 08.07.2023
-        //  1) Find Project by Id
-        //  2) Find User by Id
-        //  3) Create HQL request that checks whether comment for such a Project and User exists or not
-        //  4) Return Optional<Comment> maybeComment
-        //  5) Check maybeComment if It exists such User has already commented on it if not - Create new Comment
-        //  6) Check CommentType for this comment
-        //  7) If it is the same as requested one -> Delete Comment
-        //  8) If it's not -> change it to the other one
         return projectRepository.findById(projectId)
                 .map(project -> {
                     commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
                             .ifPresentOrElse(comment -> {
-                                // TODO: 09.07.2023 check type if the same -> delete if not -> update type
                                 if (comment.getType().equals(commentType)) {
                                     commentRepository.delete(comment);
                                     commentRepository.flush();
@@ -154,12 +144,9 @@ public class ProjectService {
                                 }
 
                             }, () -> {
-                                // TODO: 09.07.2023 create a new comment
-                                Comment comment = new Comment();
-                                comment.setProject(project);
-                                comment.setUser(userRepository.getReferenceById(userId));
-                                comment.setType(commentType);
-                                commentRepository.save(comment);
+                                commentRepository.save(Comment.of(project,
+                                        userRepository.getReferenceById(userId),
+                                        commentType));
                                 log.debug("User with ID: {} {}ED Project: {}", userId, commentType, project);
                             });
                     return true;

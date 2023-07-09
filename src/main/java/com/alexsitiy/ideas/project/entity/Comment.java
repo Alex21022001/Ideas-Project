@@ -3,6 +3,9 @@ package com.alexsitiy.ideas.project.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "user_comment")
 @NoArgsConstructor
@@ -28,6 +31,19 @@ public class Comment {
     @Column(name = "comment_type", nullable = false)
     private CommentType type;
 
+    @Column(name = "commented_at",nullable = false)
+    private Instant commentedAt;
+
+    @PrePersist
+    void prePersist(){
+        this.setCommentedAt(Instant.now());
+    }
+
+    @PreUpdate
+    void preUpdate(){
+        this.setCommentedAt(Instant.now());
+    }
+
     public static Comment of(Project project, User user, CommentType commentType) {
         Comment comment = new Comment();
         comment.setType(commentType);
@@ -36,13 +52,13 @@ public class Comment {
         return comment;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-        user.getComments().add(this);
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-        project.getComments().add(this);
-    }
+//    public void setUser(User user) {
+//        this.user = user;
+//        user.getComments().add(this);
+//    }
+//
+//    public void setProject(Project project) {
+//        this.project = project;
+//        project.getComments().add(this);
+//    }
 }

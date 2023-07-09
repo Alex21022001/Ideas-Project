@@ -98,11 +98,6 @@ public class ProjectsRestController {
     public ResponseEntity<?> likeProject(@PathVariable Integer id,
                                   @AuthenticationPrincipal SecurityUser user) {
 
-        // TODO: 08.07.2023
-        //  1) Verify user whether he has already set like or not
-        //  2) Find Project By id
-        //  3) Create comment
-        //  4) Save comment
         return projectService.likeProject(id, user.getId()) ?
                 ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
