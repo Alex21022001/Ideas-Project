@@ -195,6 +195,38 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    void likeProject() throws Exception {
+        int projectId = 1;
+
+        mockMvc.perform(post("/api/v1/projects/{id}/like", projectId))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void likeNotExistedProject() throws Exception {
+        int projectId = -1;
+
+        mockMvc.perform(post("/api/v1/projects/{id}/like", projectId))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void dislikeProject() throws Exception {
+        int projectId = 1;
+
+        mockMvc.perform(post("/api/v1/projects/{id}/dislike", projectId))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void dislikeNotExistedProject() throws Exception {
+        int projectId = -1;
+
+        mockMvc.perform(post("/api/v1/projects/{id}/dislike", projectId))
+                .andExpect(status().isNotFound());
+    }
+
     @NotNull
     private MockMultipartFile getDocFile() {
         return new MockMultipartFile("doc", "new-doc-file.pdf", "application/pdf", new byte[123]);
@@ -283,7 +315,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
         void deleteWithInvalidUser() throws Exception {
             int projectId = 3;
 
-            mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/projects/{id}",projectId))
+            mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/projects/{id}", projectId))
                     .andExpect(status().isForbidden());
         }
     }

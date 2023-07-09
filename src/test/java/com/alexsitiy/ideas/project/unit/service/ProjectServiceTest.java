@@ -3,18 +3,18 @@ package com.alexsitiy.ideas.project.unit.service;
 import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
-import com.alexsitiy.ideas.project.entity.Project;
-import com.alexsitiy.ideas.project.entity.Role;
-import com.alexsitiy.ideas.project.entity.Status;
-import com.alexsitiy.ideas.project.entity.User;
+import com.alexsitiy.ideas.project.entity.*;
 import com.alexsitiy.ideas.project.integration.annotation.IT;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectReadMapper;
 import com.alexsitiy.ideas.project.mapper.UserReadMapper;
+import com.alexsitiy.ideas.project.repository.CommentRepository;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.repository.UserRepository;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.service.S3Service;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,20 +37,24 @@ class ProjectServiceTest {
 
     @InjectMocks
     private ProjectService projectService;
+    @Mock
+    private S3Service s3Service;
 
     @Mock
     private ProjectRepository projectRepository;
     @Mock
     private UserRepository userRepository;
     @Mock
-    private S3Service s3Service;
-    @Spy
-    private ProjectCreateMapper projectCreateMapper;
+    private CommentRepository commentRepository;
     @Mock
     private ProjectReadMapper projectReadMapper;
+    @Spy
+    private ProjectCreateMapper projectCreateMapper;
 
     @Captor
     private ArgumentCaptor<Project> projectCaptor;
+    @Captor
+    private ArgumentCaptor<Comment> commentCaptor;
 
 
     @Test
@@ -182,6 +186,81 @@ class ProjectServiceTest {
                 .isEqualTo(project);
     }
 
+    @Test
+    void likeProjectWithoutComment() {
+        int userId = 1;
+        int projectId = 1;
+
+        Project project = getProject(projectId);
+
+        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+        doReturn(Optional.empty()).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
+
+        boolean actual = projectService.likeProject(projectId, userId);
+
+        Assertions.assertTrue(actual);
+        verify(commentRepository, times(1)).save(commentCaptor.capture());
+        verify(commentRepository, never()).saveAndFlush(any());
+        verify(commentRepository, never()).delete(any());
+        assertThat(commentCaptor.getValue())
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("project", project)
+                .hasFieldOrPropertyWithValue("type", CommentType.LIKE);
+    }
+
+    @Test
+    void likeProjectWithLike() {
+        int userId = 1;
+        int projectId = 1;
+
+        Project project = getProject(projectId);
+        Comment comment = getComment(userId, project, CommentType.LIKE);
+
+        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+        doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
+
+        boolean actual = projectService.likeProject(projectId, userId);
+
+        Assertions.assertTrue(actual);
+        verify(commentRepository, times(1)).delete(commentCaptor.capture());
+        verify(commentRepository,Mockito.never()).save(any());
+        verify(commentRepository,Mockito.never()).saveAndFlush(any());
+        assertThat(commentCaptor.getValue())
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("project", project)
+                .hasFieldOrPropertyWithValue("type", CommentType.LIKE);
+    }
+
+    @Test
+    void likeProjectWithDislike() {
+        int userId = 1;
+        int projectId = 1;
+
+        Project project = getProject(projectId);
+        Comment comment = getComment(userId, project, CommentType.DISLIKE);
+
+        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+        doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
+
+        boolean actual = projectService.likeProject(projectId, userId);
+
+        Assertions.assertTrue(actual);
+        verify(commentRepository, times(1)).saveAndFlush(commentCaptor.capture());
+        verify(commentRepository,Mockito.never()).save(any());
+        verify(commentRepository,Mockito.never()).delete(any());
+        assertThat(commentCaptor.getValue())
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("project", project)
+                .hasFieldOrPropertyWithValue("type", CommentType.LIKE);
+    }
+
+    @NotNull
+    private Comment getComment(int userId, Project project, CommentType commentType) {
+        return Comment.of(project,
+                User.builder()
+                        .id(userId)
+                        .build(), commentType);
+    }
 
     private Project getProject(int projectId) {
         return Project.builder()

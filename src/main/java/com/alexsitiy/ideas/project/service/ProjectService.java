@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
+import static com.alexsitiy.ideas.project.entity.QProject.project;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -39,8 +41,8 @@ public class ProjectService {
 
     public Page<ProjectReadDto> findAll(ProjectFilter filter, Pageable pageable) {
         Predicate predicate = QPredicate.builder()
-                .add(filter.title(), QProject.project.title::containsIgnoreCase)
-                .add(filter.statuses(), QProject.project.status::in)
+                .add(filter.title(), project.title::containsIgnoreCase)
+                .add(filter.statuses(), project.status::in)
                 .buildAll();
 
         return projectRepository.findAll(predicate, pageable)

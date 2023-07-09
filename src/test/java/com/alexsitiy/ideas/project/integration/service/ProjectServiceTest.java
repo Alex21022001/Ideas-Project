@@ -5,6 +5,7 @@ import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.dto.UserReadDto;
 import com.alexsitiy.ideas.project.entity.Comment;
+import com.alexsitiy.ideas.project.entity.CommentType;
 import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.integration.IntegrationTestBase;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
@@ -88,7 +89,8 @@ class ProjectServiceTest extends IntegrationTestBase {
         assertThat(project).isPresent()
                 .map(Project::getComments)
                 .isNotEmpty().get(InstanceOfAssertFactories.list(Comment.class))
-                .anyMatch(comment -> comment.getUser().getId().equals(userId));
+                .anyMatch(comment -> comment.getUser().getId().equals(userId) &&
+                                     comment.getType().equals(CommentType.LIKE));
     }
 
     @NotNull
