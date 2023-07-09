@@ -5,6 +5,7 @@ import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.dto.error.FileErrorResponse;
 import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
+import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.exception.UploadingFileException;
 import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.ProjectService;
@@ -96,7 +97,7 @@ public class ProjectsRestController {
 
     @PostMapping("/{id}/like")
     public ResponseEntity<?> likeProject(@PathVariable Integer id,
-                                  @AuthenticationPrincipal SecurityUser user) {
+                                         @AuthenticationPrincipal SecurityUser user) {
 
         return projectService.likeProject(id, user.getId()) ?
                 ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
@@ -104,10 +105,15 @@ public class ProjectsRestController {
 
     @PostMapping("/{id}/dislike")
     public ResponseEntity<?> dislikeProject(@PathVariable Integer id,
-                                  @AuthenticationPrincipal SecurityUser user) {
+                                            @AuthenticationPrincipal SecurityUser user) {
 
         return projectService.dislikeProject(id, user.getId()) ?
                 ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(NoSuchProjectException.class)
+    public ResponseEntity<?> handleNoSuchProjectException() {
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler({UploadingFileException.class})
