@@ -1,6 +1,5 @@
 package com.alexsitiy.ideas.project.integration.controller;
 
-import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.entity.Role;
@@ -8,31 +7,23 @@ import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.assertj.core.api.Assertions;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.core.Is;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.multipart.Part;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.mock.web.MockPart;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -50,7 +41,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     @Test
     void create() throws Exception {
-        MockMultipartFile imageFile = getImage();
+        MockMultipartFile imageFile = getImageFile();
 
         doReturn(Optional.of("newPath")).when(s3Service).upload(any(), eq(Project.class));
 
@@ -131,17 +122,14 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
     void updateImage() throws Exception {
         int projectId = 1;
         String newImagePath = "newImagePth";
-        MockMultipartFile image = getImage();
+        MockMultipartFile image = getImageFile();
 
         doReturn(Optional.of(newImagePath)).when(s3Service).upload(image, Project.class);
 
         mockMvc.perform(multipart("/api/v1/projects/{id}/image", projectId)
                         .file(image)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .with(request -> {
-                            request.setMethod("PUT");
-                            return request;
-                        })
+                        .with(getRequestPostProcessor())
                 )
                 .andExpect(status().is(205));
 
@@ -160,10 +148,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
         mockMvc.perform(multipart("/api/v1/projects/{id}/image", projectId)
                         .file(image)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .with(request -> {
-                            request.setMethod("PUT");
-                            return request;
-                        })
+                        .with(getRequestPostProcessor())
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -179,10 +164,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
         mockMvc.perform(multipart("/api/v1/projects/{id}/doc", projectId)
                         .file(docFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .with(request -> {
-                            request.setMethod("PUT");
-                            return request;
-                        })
+                        .with(getRequestPostProcessor())
                 )
                 .andExpect(status().is(205));
 
@@ -200,10 +182,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
         mockMvc.perform(multipart("/api/v1/projects/{id}/doc", projectId)
                         .file(image)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .with(request -> {
-                            request.setMethod("PUT");
-                            return request;
-                        })
+                        .with(getRequestPostProcessor())
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -212,7 +191,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
     void delete() throws Exception {
         int projectId = 1;
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/projects/{id}",projectId))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/projects/{id}", projectId))
                 .andExpect(status().isNoContent());
     }
 
@@ -227,14 +206,23 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
     }
 
     @NotNull
-    private MockMultipartFile getImage() {
+    private MockMultipartFile getImageFile() {
         return new MockMultipartFile("image",
                 "some-image.png", "image/png", new byte[123]);
     }
 
 
+    @NotNull
+    private RequestPostProcessor getRequestPostProcessor() {
+        return request -> {
+            request.setMethod("PUT");
+            return request;
+        };
+    }
+
     @Nested
     class ProjectRestControllerAuthTest {
+
 
         @Test
         void updateWithInvalidUser() throws Exception {
@@ -250,6 +238,52 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(toJson(updateDto))
                             .with(user(user)))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void updateWithInvalidId() throws Exception {
+            int projectId = -1;
+            String title = "New title";
+            String description = "Something";
+
+            ProjectUpdateDto updateDto = new ProjectUpdateDto(title, description);
+
+            mockMvc.perform(put("/api/v1/projects/{id}", projectId)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(toJson(updateDto)))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void updateImageWithInvalidUser() throws Exception {
+            int projectId = 3;
+
+            mockMvc.perform(multipart("/api/v1/projects/{id}/image", projectId)
+                            .file(getImageFile())
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .with(getRequestPostProcessor()))
+                    .andExpect(status().isForbidden());
+        }
+
+
+        @Test
+        void updateDocWithInvalidUser() throws Exception {
+            int projectId = 3;
+
+            mockMvc.perform(multipart("/api/v1/projects/{id}/doc", projectId)
+                            .file(getDocFile())
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .with(getRequestPostProcessor()))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        void deleteWithInvalidUser() throws Exception {
+            int projectId = 3;
+
+            mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/projects/{id}",projectId))
                     .andExpect(status().isForbidden());
         }
     }
