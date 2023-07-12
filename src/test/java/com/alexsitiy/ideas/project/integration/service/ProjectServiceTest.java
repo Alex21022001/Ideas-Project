@@ -1,16 +1,13 @@
 package com.alexsitiy.ideas.project.integration.service;
 
-import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
-import com.alexsitiy.ideas.project.dto.ProjectReadDto;
-import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
-import com.alexsitiy.ideas.project.dto.UserReadDto;
-import com.alexsitiy.ideas.project.entity.Comment;
-import com.alexsitiy.ideas.project.entity.CommentType;
-import com.alexsitiy.ideas.project.entity.Project;
+import com.alexsitiy.ideas.project.dto.*;
+import com.alexsitiy.ideas.project.entity.*;
 import com.alexsitiy.ideas.project.integration.IntegrationTestBase;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.service.S3Service;
+import com.querydsl.core.Tuple;
+import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.assertj.core.api.Assertions;
@@ -24,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.as;
@@ -92,6 +90,17 @@ class ProjectServiceTest extends IntegrationTestBase {
                 .anyMatch(comment -> comment.getUser().getId().equals(userId) &&
                                      comment.getType().equals(CommentType.LIKE));
     }
+
+//    @Test
+//    void findAll() {
+//        List<Tuple> projects = projectRepository.findAllProjectsWithLikesAndDislikes();
+//        projects.stream().map(tuple -> {
+//            Project project = tuple.get(0, Project.class);
+//            Integer likes = tuple.get(1, Integer.class);
+//            Integer dislikes = tuple.get(2, Integer.class);
+//            return new ProjectProjection(project, likes, dislikes);
+//        }).forEach(System.out::println);
+//    }
 
     @NotNull
     private ProjectCreateDto getCreateDto() {

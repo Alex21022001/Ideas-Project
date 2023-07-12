@@ -193,7 +193,7 @@ class ProjectServiceTest {
 
         Project project = getProject(projectId);
 
-        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+        doReturn(Optional.of(project)).when(projectRepository).findByIdWithLock(projectId);
         doReturn(Optional.empty()).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
 
         boolean actual = projectService.likeProject(projectId, userId);
@@ -216,7 +216,7 @@ class ProjectServiceTest {
         Project project = getProject(projectId);
         Comment comment = getComment(userId, project, CommentType.LIKE);
 
-        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+        doReturn(Optional.of(project)).when(projectRepository).findByIdWithLock(projectId);
         doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
 
         boolean actual = projectService.likeProject(projectId, userId);
@@ -239,7 +239,7 @@ class ProjectServiceTest {
         Project project = getProject(projectId);
         Comment comment = getComment(userId, project, CommentType.DISLIKE);
 
-        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+        doReturn(Optional.of(project)).when(projectRepository).findByIdWithLock(projectId);
         doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
 
         boolean actual = projectService.likeProject(projectId, userId);

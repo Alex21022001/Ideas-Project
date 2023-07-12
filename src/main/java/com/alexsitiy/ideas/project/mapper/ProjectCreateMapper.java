@@ -14,6 +14,8 @@ public class ProjectCreateMapper implements Mapper<ProjectCreateDto, Project>{
                 .title(object.getTitle())
                 .description(object.getDescription())
                 .status(Status.WAITING)
+                .likes(0)
+                .dislikes(0)
                 .build();
     }
 }

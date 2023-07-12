@@ -12,6 +12,7 @@ import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.repository.UserRepository;
 import com.alexsitiy.ideas.project.util.QPredicate;
 import com.querydsl.core.types.Predicate;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -38,6 +39,7 @@ public class ProjectService {
     private final ProjectCreateMapper projectCreateMapper;
     private final ProjectReadMapper projectReadMapper;
 
+    private final EntityManager entityManager;
 
     public Page<ProjectReadDto> findAll(ProjectFilter filter, Pageable pageable) {
         Predicate predicate = QPredicate.builder()
@@ -130,8 +132,9 @@ public class ProjectService {
         return comment(id, userId, CommentType.DISLIKE);
     }
 
+
     private boolean comment(Integer projectId, Integer userId, CommentType commentType) {
-        return projectRepository.findById(projectId)
+        return projectRepository.findByIdWithLock(projectId)
                 .map(project -> {
                     commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
                             .ifPresentOrElse(comment -> {

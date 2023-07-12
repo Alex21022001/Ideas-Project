@@ -2,6 +2,9 @@ package com.alexsitiy.ideas.project.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.OptimisticLockType;
+import org.hibernate.annotations.OptimisticLocking;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -13,8 +16,9 @@ import java.util.List;
 @Builder
 @Entity
 @Table
-@ToString(exclude = {"user","comments"})
-@EqualsAndHashCode(exclude = {"user","comments"})
+@ToString(exclude = {"user", "comments"})
+@EqualsAndHashCode(exclude = {"user", "comments"})
+@DynamicUpdate
 public class Project {
 
     @Id
@@ -36,11 +40,17 @@ public class Project {
     @Column(name = "docs_path")
     private String docsPath;
 
+    @Column(name = "likes", nullable = false)
+    private Integer likes;
+
+    @Column(name = "dislikes", nullable = false)
+    private Integer dislikes;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Builder.Default
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 }
