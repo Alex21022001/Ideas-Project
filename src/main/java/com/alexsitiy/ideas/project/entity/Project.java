@@ -18,7 +18,6 @@ import java.util.List;
 @Table
 @ToString(exclude = {"user", "comments"})
 @EqualsAndHashCode(exclude = {"user", "comments"})
-@DynamicUpdate
 public class Project {
 
     @Id
@@ -40,15 +39,12 @@ public class Project {
     @Column(name = "docs_path")
     private String docsPath;
 
-    @Column(name = "likes", nullable = false)
-    private Integer likes;
-
-    @Column(name = "dislikes", nullable = false)
-    private Integer dislikes;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToOne(mappedBy = "project", optional = false, cascade = CascadeType.PERSIST)
+    private Reaction reaction;
 
     @Builder.Default
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)

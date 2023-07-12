@@ -61,6 +61,7 @@ public class ProjectService {
         return userRepository.findById(userId)
                 .map(user -> {
                     Project project = projectCreateMapper.map(projectDto);
+                    Reaction reaction = new Reaction();
 
                     uploadFile(projectDto.getImage())
                             .ifPresent(project::setImagePath);
@@ -68,7 +69,9 @@ public class ProjectService {
                     uploadFile(projectDto.getDocs())
                             .ifPresent(project::setDocsPath);
 
+
                     user.addProject(project);
+                    reaction.setProject(project);
                     projectRepository.save(project);
                     log.debug("Project {} was created", project);
                     return project;
@@ -134,7 +137,7 @@ public class ProjectService {
 
 
     private boolean comment(Integer projectId, Integer userId, CommentType commentType) {
-        return projectRepository.findByIdWithLock(projectId)
+        return projectRepository.findById(projectId)
                 .map(project -> {
                     commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
                             .ifPresentOrElse(comment -> {

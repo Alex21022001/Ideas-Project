@@ -14,7 +14,15 @@ public class IdeasProjectApplication {
         // TODO: 11.07.2023
         //  1) Check Like and Dislike method + tests
         //  2) Add new Table which contains Likes and Dislikes for each project and use it in order to set LOCK
-        //  3) Add Project created_at in order to see new Project and add title "NEW" on Front
+        //  Create Reaction when a new Project is created
+        //  Add Project's likes and dislikes in ProjectReadDto
+        //  Add LOCK on Reaction while User is commenting on the Project
+        //  Add Like-Dislike increment during commenting
+        //  Change Like-Dislike Tests
+        //
+        //
+        //
+        //  3) Add Project created_at in order to see a new Project and add title "NEW" on Front
         //  4) User's liked and disliked projects
         SpringApplication.run(IdeasProjectApplication.class, args);
     }
