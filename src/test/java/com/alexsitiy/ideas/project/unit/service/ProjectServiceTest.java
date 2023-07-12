@@ -4,10 +4,8 @@ import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.entity.*;
-import com.alexsitiy.ideas.project.integration.annotation.IT;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectReadMapper;
-import com.alexsitiy.ideas.project.mapper.UserReadMapper;
 import com.alexsitiy.ideas.project.repository.CommentRepository;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.repository.UserRepository;
@@ -15,15 +13,11 @@ import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.service.S3Service;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
@@ -102,7 +96,7 @@ class ProjectServiceTest {
         ProjectUpdateDto updateDto = new ProjectUpdateDto(title, description);
         Project project = getProject(projectId);
 
-        doReturn(Optional.of(project)).when(projectRepository).findByIdWithUser(projectId);
+        doReturn(Optional.of(project)).when(projectRepository).findByIdWithUserAndReaction(projectId);
         doReturn(Project.builder()
                 .id(projectId)
                 .title(title)

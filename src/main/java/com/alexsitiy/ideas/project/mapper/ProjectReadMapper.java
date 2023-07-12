@@ -21,6 +21,8 @@ public class ProjectReadMapper implements Mapper<Project, ProjectReadDto> {
                 .image(object.getImagePath())
                 .docs(object.getDocsPath())
                 .status(object.getStatus())
+                .likes(object.getReaction().getLikes())
+                .dislikes(object.getReaction().getDislikes())
                 .creator(userReadMapper.map(object.getUser()))
                 .build();
     }

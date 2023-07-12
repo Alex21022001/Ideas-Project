@@ -18,7 +18,7 @@ public class IdeasProjectApplication {
         //  Add Project's likes and dislikes in ProjectReadDto
         //  Add LOCK on Reaction while User is commenting on the Project
         //  Add Like-Dislike increment during commenting
-        //  Change Like-Dislike Tests
+        //  Change Like-Dislike Tests (change data.slq)
         //
         //
         //
