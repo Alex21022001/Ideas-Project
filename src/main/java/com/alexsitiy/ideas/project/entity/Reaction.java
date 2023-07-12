@@ -30,4 +30,30 @@ public class Reaction {
         this.project = project;
         project.setReaction(this);
     }
+
+    public void increment(CommentType commentType) {
+        if (commentType == CommentType.LIKE) {
+            likes++;
+        } else {
+            dislikes++;
+        }
+    }
+
+    public void decrement(CommentType commentType) {
+        if (commentType == CommentType.LIKE) {
+            likes--;
+        } else {
+            dislikes--;
+        }
+    }
+
+    public void change(CommentType commentType) {
+        if (commentType == CommentType.LIKE) {
+            likes++;
+            dislikes--;
+        } else {
+            dislikes++;
+            likes--;
+        }
+    }
 }

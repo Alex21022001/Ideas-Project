@@ -21,7 +21,7 @@ public class IdeasProjectApplication {
         //  Change Like-Dislike Tests (change data.slq)
         //
         //
-        //
+        //  3) Change UserVerify method. Change findById() to exists
         //  3) Add Project created_at in order to see a new Project and add title "NEW" on Front
         //  4) User's liked and disliked projects
         SpringApplication.run(IdeasProjectApplication.class, args);

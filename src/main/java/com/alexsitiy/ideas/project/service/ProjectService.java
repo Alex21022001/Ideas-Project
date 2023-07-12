@@ -9,6 +9,7 @@ import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectReadMapper;
 import com.alexsitiy.ideas.project.repository.CommentRepository;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
+import com.alexsitiy.ideas.project.repository.ReactionRepository;
 import com.alexsitiy.ideas.project.repository.UserRepository;
 import com.alexsitiy.ideas.project.util.QPredicate;
 import com.querydsl.core.types.Predicate;
@@ -35,6 +36,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final ReactionRepository reactionRepository;
 
     private final ProjectCreateMapper projectCreateMapper;
     private final ProjectReadMapper projectReadMapper;
@@ -137,29 +139,15 @@ public class ProjectService {
 
 
     private boolean comment(Integer projectId, Integer userId, CommentType commentType) {
-        return projectRepository.findById(projectId)
-                .map(project -> {
-                    commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
-                            .ifPresentOrElse(comment -> {
-                                if (comment.getType().equals(commentType)) {
-                                    commentRepository.delete(comment);
-                                    commentRepository.flush();
-                                    log.debug("Comment: {} was deleted", comment);
-                                } else {
-                                    comment.setType(commentType);
-                                    commentRepository.saveAndFlush(comment);
-                                    log.debug("Comment: {} was updated. CommentType was changed to {}", comment, commentType);
-                                }
+        if (!projectRepository.existsById(projectId)) {
+            return false;
+        }
 
-                            }, () -> {
-                                commentRepository.save(Comment.of(project,
-                                        userRepository.getReferenceById(userId),
-                                        commentType));
-                                log.debug("User with ID: {} {}ED Project: {}", userId, commentType, project);
-                            });
-                    return true;
-                })
-                .orElse(false);
+        reactionRepository.findReactionByProjectId(projectId)
+                .ifPresent(reaction -> commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
+                        .ifPresentOrElse(comment -> handleExistingComment(commentType, reaction, comment),
+                                () -> handleNotExistingComment(projectId, userId, commentType, reaction)));
+        return true;
     }
 
     private Optional<String> uploadFile(MultipartFile file) {
@@ -168,6 +156,39 @@ public class ProjectService {
         else {
             return s3Service.upload(file, Project.class);
         }
+    }
+
+    private void handleExistingComment(CommentType commentType, Reaction reaction, Comment comment) {
+        if (comment.getType().equals(commentType)) {
+            reaction.decrement(commentType);
+
+            reactionRepository.save(reaction);
+            commentRepository.delete(comment);
+            commentRepository.flush();
+            log.debug("Comment: {} was deleted", comment);
+            log.debug("Reaction: {}, {}s were decremented", reaction, commentType.name().toLowerCase());
+        } else {
+            comment.setType(commentType);
+            reaction.change(commentType);
+
+            reactionRepository.save(reaction);
+            commentRepository.save(comment);
+            commentRepository.flush();
+            log.debug("Comment: {} was updated. CommentType was changed to {}", comment, commentType);
+            log.debug("Reaction: {}, {}s were incremented", reaction, commentType.name().toLowerCase());
+        }
+    }
+
+    private void handleNotExistingComment(Integer projectId, Integer userId, CommentType commentType, Reaction reaction) {
+        Comment comment = Comment.of(
+                projectRepository.getReferenceById(projectId),
+                userRepository.getReferenceById(userId),
+                commentType);
+        reaction.increment(commentType);
+
+        commentRepository.save(comment);
+        reactionRepository.saveAndFlush(reaction);
+        log.debug("User with ID: {} {}ED Project: {}. Current Reactions: {}", userId, commentType, projectId, reaction);
     }
 }
 
