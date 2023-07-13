@@ -12,19 +12,19 @@ public class IdeasProjectApplication {
 
     public static void main(String[] args) {
         // TODO: 11.07.2023
-        //  1) Check Like and Dislike method + tests
-        //  2) Add new Table which contains Likes and Dislikes for each project and use it in order to set LOCK
-        //  Create Reaction when a new Project is created
-        //  Add Project's likes and dislikes in ProjectReadDto
-        //  Add LOCK on Reaction while User is commenting on the Project
-        //  Add Like-Dislike increment during commenting
-        //  Change Like-Dislike Tests (change data.slq)
-        //  Add Reaction check in Tests (UnitPService, ITPService, PController)
-        //  Change findAllProject to custom implementation
+        //  User Avatar (not required, can use default avatar)
+        //  Add getAvatar()
+        //  Add User update feature
+        //  Add User update Avatar Test
+        //  Change ConstraintViolationException handler
         //
-        //  3) Change UserVerify method. Change findById() to exists
-        //  3) Add Project created_at in order to see a new Project and add title "NEW" on Front
-        //  4) User's liked and disliked projects
+        //  User's liked and disliked projects
+        //
+        //  Add Project created_at in order to see a new Project and add title "NEW" on Front
+        //  Add getProjectImage() and getProjectDoc()
+        //
+        //  Add caching on Project
+        //
         SpringApplication.run(IdeasProjectApplication.class, args);
     }
 

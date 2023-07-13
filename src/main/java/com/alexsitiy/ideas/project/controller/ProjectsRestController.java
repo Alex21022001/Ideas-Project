@@ -127,12 +127,6 @@ public class ProjectsRestController {
         return ResponseEntity.notFound().build();
     }
 
-
-    @ExceptionHandler({UploadingFileException.class})
-    public ResponseEntity<FileErrorResponse> handleUploadingFileException(UploadingFileException fileException) {
-        return ResponseEntity.internalServerError().body(FileErrorResponse.of(fileException));
-    }
-
     private Sort buildSort(List<String> sortList) {
         List<Sort.Order> sortOrderList = new ArrayList<>();
 

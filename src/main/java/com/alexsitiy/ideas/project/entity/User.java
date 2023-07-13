@@ -16,15 +16,15 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
-@ToString(exclude = {"projects","password","comments"})
-@EqualsAndHashCode(exclude = {"projects","comments"})
+@ToString(exclude = {"projects", "password", "comments"})
+@EqualsAndHashCode(exclude = {"projects", "comments"})
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "firstname",nullable = false)
+    @Column(name = "firstname", nullable = false)
     private String firstname;
 
     @Column(name = "lastname", nullable = false)
@@ -34,21 +34,24 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "username",nullable = false,unique = true)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "password",nullable = false)
+    @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "avatar", nullable = false)
+    private String avatar;
+
     @Builder.Default
-    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY,orphanRemoval = true,cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Project> projects = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY,orphanRemoval = true)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    public void addProject(Project project){
+    public void addProject(Project project) {
         projects.add(project);
         project.setUser(this);
     }

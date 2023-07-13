@@ -13,4 +13,8 @@ CREATE TABLE reaction
     project_id int REFERENCES project(id) ON DELETE CASCADE UNIQUE NOT NULL
 );
 
+--changeset alexsitiy:3
+ALTER TABLE users
+    ADD COLUMN avatar varchar(128) NOT NULL DEFAULT 'defaultAvatar.png'
+
 

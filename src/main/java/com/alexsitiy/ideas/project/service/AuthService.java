@@ -11,6 +11,7 @@ import com.alexsitiy.ideas.project.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final String JWT_TYPE = "Bearer ";
+    @Value("${app.user.default-avatar}")
+    private final String USER_DEFAULT_AVATAR;
 
     private final UserRepository userRepository;
 
@@ -40,6 +43,7 @@ public class AuthService {
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
+                .avatar(USER_DEFAULT_AVATAR)
                 .build();
 
         User savedUser = userRepository.save(user);

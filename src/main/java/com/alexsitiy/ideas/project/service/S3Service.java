@@ -1,6 +1,7 @@
 package com.alexsitiy.ideas.project.service;
 
 import com.alexsitiy.ideas.project.entity.Project;
+import com.alexsitiy.ideas.project.entity.User;
 import com.alexsitiy.ideas.project.exception.UploadingFileException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,8 @@ public class S3Service {
 
     @Value("${aws.s3.projects-url}")
     private final String PROJECT_BASE_URL;
+    @Value("${aws.s3.users-url}")
+    private final String USERS_BASE_URL;
     @Value("${aws.s3.bucket.name}")
     private final String BUCKET;
 
@@ -62,6 +65,8 @@ public class S3Service {
     private String buildPath(String filename, Class<?> clazz) {
         if (clazz.equals(Project.class)) {
             return PROJECT_BASE_URL + filename;
+        } else if (clazz.equals(User.class)) {
+            return USERS_BASE_URL + filename;
         }
         throw new IllegalArgumentException("There is no such a path for " + clazz.getName());
     }
