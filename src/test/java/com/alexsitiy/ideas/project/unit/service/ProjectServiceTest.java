@@ -8,6 +8,7 @@ import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectReadMapper;
 import com.alexsitiy.ideas.project.repository.CommentRepository;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
+import com.alexsitiy.ideas.project.repository.ReactionRepository;
 import com.alexsitiy.ideas.project.repository.UserRepository;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.service.S3Service;
@@ -41,6 +42,10 @@ class ProjectServiceTest {
     @Mock
     private CommentRepository commentRepository;
     @Mock
+    private ReactionRepository reactionRepository;
+
+
+    @Mock
     private ProjectReadMapper projectReadMapper;
     @Spy
     private ProjectCreateMapper projectCreateMapper;
@@ -49,6 +54,8 @@ class ProjectServiceTest {
     private ArgumentCaptor<Project> projectCaptor;
     @Captor
     private ArgumentCaptor<Comment> commentCaptor;
+    @Captor
+    private ArgumentCaptor<Reaction> reactionCaptor;
 
 
     @Test
@@ -185,21 +192,27 @@ class ProjectServiceTest {
         int userId = 1;
         int projectId = 1;
 
-        Project project = getProject(projectId);
+        Reaction reaction = getReaction(getProject(projectId));
 
-        doReturn(Optional.of(project)).when(projectRepository).findByIdWithLock(projectId);
+        doReturn(true).when(projectRepository).existsById(projectId);
+        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(projectId);
         doReturn(Optional.empty()).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
 
         boolean actual = projectService.likeProject(projectId, userId);
 
         Assertions.assertTrue(actual);
         verify(commentRepository, times(1)).save(commentCaptor.capture());
+        verify(reactionRepository, times(1)).saveAndFlush(reactionCaptor.capture());
         verify(commentRepository, never()).saveAndFlush(any());
         verify(commentRepository, never()).delete(any());
         assertThat(commentCaptor.getValue())
                 .isNotNull()
-                .hasFieldOrPropertyWithValue("project", project)
                 .hasFieldOrPropertyWithValue("type", CommentType.LIKE);
+        assertThat(reactionCaptor.getValue())
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("likes", 2)
+                .hasFieldOrPropertyWithValue("dislikes", 1);
+
     }
 
     @Test
@@ -209,20 +222,26 @@ class ProjectServiceTest {
 
         Project project = getProject(projectId);
         Comment comment = getComment(userId, project, CommentType.LIKE);
+        Reaction reaction = getReaction(project);
 
-        doReturn(Optional.of(project)).when(projectRepository).findByIdWithLock(projectId);
+        doReturn(true).when(projectRepository).existsById(projectId);
+        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(projectId);
         doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
 
         boolean actual = projectService.likeProject(projectId, userId);
 
         Assertions.assertTrue(actual);
         verify(commentRepository, times(1)).delete(commentCaptor.capture());
-        verify(commentRepository,Mockito.never()).save(any());
-        verify(commentRepository,Mockito.never()).saveAndFlush(any());
+        verify(reactionRepository,times(1)).save(reactionCaptor.capture());
+        verify(commentRepository, Mockito.never()).save(any());
+        verify(commentRepository, Mockito.never()).saveAndFlush(any());
         assertThat(commentCaptor.getValue())
                 .isNotNull()
-                .hasFieldOrPropertyWithValue("project", project)
                 .hasFieldOrPropertyWithValue("type", CommentType.LIKE);
+        assertThat(reactionCaptor.getValue())
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("likes", 0)
+                .hasFieldOrPropertyWithValue("dislikes", 1);
     }
 
     @Test
@@ -232,20 +251,26 @@ class ProjectServiceTest {
 
         Project project = getProject(projectId);
         Comment comment = getComment(userId, project, CommentType.DISLIKE);
+        Reaction reaction = getReaction(project);
 
-        doReturn(Optional.of(project)).when(projectRepository).findByIdWithLock(projectId);
+        doReturn(true).when(projectRepository).existsById(projectId);
+        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(projectId);
         doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
 
         boolean actual = projectService.likeProject(projectId, userId);
 
         Assertions.assertTrue(actual);
-        verify(commentRepository, times(1)).saveAndFlush(commentCaptor.capture());
-        verify(commentRepository,Mockito.never()).save(any());
-        verify(commentRepository,Mockito.never()).delete(any());
+        verify(commentRepository, times(1)).save(commentCaptor.capture());
+        verify(reactionRepository,times(1)).save(reactionCaptor.capture());
+        verify(commentRepository, Mockito.never()).saveAndFlush(any());
+        verify(commentRepository, Mockito.never()).delete(any());
         assertThat(commentCaptor.getValue())
                 .isNotNull()
-                .hasFieldOrPropertyWithValue("project", project)
                 .hasFieldOrPropertyWithValue("type", CommentType.LIKE);
+        assertThat(reactionCaptor.getValue())
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("likes", 2)
+                .hasFieldOrPropertyWithValue("dislikes", 0);
     }
 
     @NotNull
@@ -265,6 +290,10 @@ class ProjectServiceTest {
                 .docsPath("test1.pdf")
                 .status(Status.WAITING)
                 .build();
+    }
+
+    private Reaction getReaction(Project project) {
+        return new Reaction(1, 1, 1, project);
     }
 }
 

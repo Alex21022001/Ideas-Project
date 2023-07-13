@@ -89,6 +89,11 @@ class ProjectServiceTest extends IntegrationTestBase {
                 .isNotEmpty().get(InstanceOfAssertFactories.list(Comment.class))
                 .anyMatch(comment -> comment.getUser().getId().equals(userId) &&
                                      comment.getType().equals(CommentType.LIKE));
+        assertThat(project).isPresent()
+                .map(Project::getReaction)
+                .isNotEmpty().get(InstanceOfAssertFactories.type(Reaction.class))
+                .hasFieldOrPropertyWithValue("likes", 1)
+                .hasFieldOrPropertyWithValue("dislikes", 1);
     }
 
 //    @Test

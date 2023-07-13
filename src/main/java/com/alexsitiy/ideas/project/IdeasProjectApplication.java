@@ -19,7 +19,9 @@ public class IdeasProjectApplication {
         //  Add LOCK on Reaction while User is commenting on the Project
         //  Add Like-Dislike increment during commenting
         //  Change Like-Dislike Tests (change data.slq)
+        //  Add Reaction check in Tests (UnitPService, ITPService, PController)
         //
+        //  Change findAllProject to custom implementation
         //
         //  3) Change UserVerify method. Change findById() to exists
         //  3) Add Project created_at in order to see a new Project and add title "NEW" on Front

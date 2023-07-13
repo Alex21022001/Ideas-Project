@@ -19,3 +19,9 @@ VALUES (1, 1, 1, 'LIKE', '2023-07-09 18:33:06.981997'),
        (5, 2, 2, 'DISLIKE', '2023-07-09 18:36:06.981997'),
        (6, 2, 3, 'DISLIKE', '2023-07-09 18:36:06.981997');
 SELECT setval('user_comment_id_seq', (SELECT MAX(id) FROM user_comment));
+
+INSERT INTO reaction(id, likes, dislikes, project_id)
+VALUES (1, 2, 0, 1),
+       (2, 1, 1, 2),
+       (3, 0, 2, 3);
+SELECT setval('reaction_id_seq', (SELECT MAX(id) FROM reaction))
