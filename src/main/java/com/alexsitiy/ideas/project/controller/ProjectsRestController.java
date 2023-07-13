@@ -1,19 +1,20 @@
 package com.alexsitiy.ideas.project.controller;
 
-import com.alexsitiy.ideas.project.dto.ProjectFilter;
-import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
+import com.alexsitiy.ideas.project.dto.*;
 import com.alexsitiy.ideas.project.dto.error.FileErrorResponse;
-import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
-import com.alexsitiy.ideas.project.dto.ProjectReadDto;
+import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.exception.UploadingFileException;
 import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.validation.FileCheck;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -41,9 +44,17 @@ public class ProjectsRestController {
     }
 
     @GetMapping
-    public ResponseEntity<?> findAll(ProjectFilter filter, Pageable pageable) {
+    public ResponseEntity<PageResponse<ProjectReadDto>> findAll(ProjectFilter filter,
+                                                                @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
+                                                                @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
+                                                                @RequestParam(value = "sort", required = false, defaultValue = "likes") List<String> sortList) {
 
-        return ResponseEntity.ok(projectService.findAll(filter, pageable));
+        Sort sort = buildSort(sortList);
+        PageRequest pageable = PageRequest.of(page, size, sort);
+
+        Page<ProjectReadDto> projectReadPage = projectService.findAll(filter, pageable);
+
+        return ResponseEntity.ok(PageResponse.of(projectReadPage));
     }
 
     @PostMapping
@@ -116,8 +127,23 @@ public class ProjectsRestController {
         return ResponseEntity.notFound().build();
     }
 
+
     @ExceptionHandler({UploadingFileException.class})
     public ResponseEntity<FileErrorResponse> handleUploadingFileException(UploadingFileException fileException) {
         return ResponseEntity.internalServerError().body(FileErrorResponse.of(fileException));
+    }
+
+    private Sort buildSort(List<String> sortList) {
+        List<Sort.Order> sortOrderList = new ArrayList<>();
+
+        for (String sort : sortList) {
+            switch (sort) {
+                case "likes" -> sortOrderList.add(Sort.Order.desc("reaction.likes"));
+                case "dislikes" -> sortOrderList.add(Sort.Order.desc("reaction.dislikes"));
+                case "title" -> sortOrderList.add(Sort.Order.asc("title"));
+            }
+        }
+
+        return Sort.by(sortOrderList);
     }
 }

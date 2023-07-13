@@ -20,7 +20,6 @@ public class IdeasProjectApplication {
         //  Add Like-Dislike increment during commenting
         //  Change Like-Dislike Tests (change data.slq)
         //  Add Reaction check in Tests (UnitPService, ITPService, PController)
-        //
         //  Change findAllProject to custom implementation
         //
         //  3) Change UserVerify method. Change findById() to exists

@@ -40,6 +40,22 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
     private final ProjectRepository projectRepository;
 
     @Test
+    void findAll() throws Exception {
+        mockMvc.perform(get("/api/v1/projects")
+                .param("page","0")
+                .param("size","2")
+                .param("sort","likes")
+                .param("title","test"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("data",hasSize(2)),
+                        jsonPath("metadata.currentPage").value("0"),
+                        jsonPath("metadata.totalPages").value("2"),
+                        jsonPath("metadata.totalElements").value("3"));
+
+    }
+
+    @Test
     void create() throws Exception {
         MockMultipartFile imageFile = getImageFile();
 
