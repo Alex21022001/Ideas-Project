@@ -143,10 +143,12 @@ public class ProjectService {
             return false;
         }
 
-        reactionRepository.findReactionByProjectId(projectId)
+        reactionRepository.findByIdWithLock(projectId)
                 .ifPresent(reaction -> commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
-                        .ifPresentOrElse(comment -> handleExistingComment(commentType, reaction, comment),
+                        .ifPresentOrElse(comment ->
+                                        handleExistingComment(commentType, reaction, comment),
                                 () -> handleNotExistingComment(projectId, userId, commentType, reaction)));
+
         return true;
     }
 

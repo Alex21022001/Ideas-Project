@@ -18,12 +18,8 @@ public interface ProjectRepository extends JpaRepository<Project, Integer>,
 
     Optional<Project> findByTitle(String title);
 
-    @Query("SELECT p FROM Project p WHERE p.id =:id")
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<Project> findByIdWithLock(Integer id);
-
     @Override
-    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = {"user","reaction"})
     Page<Project> findAll(Predicate predicate, Pageable pageable);
 
     @EntityGraph(attributePaths = {"user","reaction"})
