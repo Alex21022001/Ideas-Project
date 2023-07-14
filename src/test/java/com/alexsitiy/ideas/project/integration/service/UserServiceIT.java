@@ -2,6 +2,7 @@ package com.alexsitiy.ideas.project.integration.service;
 
 import com.alexsitiy.ideas.project.dto.UserFullReadDto;
 import com.alexsitiy.ideas.project.dto.UserReadDto;
+import com.alexsitiy.ideas.project.dto.UserUpdateDto;
 import com.alexsitiy.ideas.project.entity.User;
 import com.alexsitiy.ideas.project.integration.IntegrationTestBase;
 import com.alexsitiy.ideas.project.repository.UserRepository;
@@ -47,11 +48,16 @@ class UserServiceIT extends IntegrationTestBase {
     }
 
     @Test
-    void loadUserByUsername() {
-        UserDetails userDetails = userService.loadUserByUsername(USER_1_USERNAME);
+    void update() {
+        UserUpdateDto updateDto = new UserUpdateDto("newFirstname", "newLastname");
 
-        assertThat(userDetails)
-                .hasFieldOrPropertyWithValue("username", USER_1_USERNAME);
+        Optional<UserFullReadDto> actual = userService.update(USER_1_ID, updateDto);
+
+        assertThat(actual).isPresent()
+                .get()
+                .hasFieldOrPropertyWithValue("id", USER_1_ID)
+                .hasFieldOrPropertyWithValue("firstname", updateDto.getFirstname())
+                .hasFieldOrPropertyWithValue("lastname", updateDto.getLastname());
     }
 
     @Test
@@ -78,6 +84,14 @@ class UserServiceIT extends IntegrationTestBase {
         Optional<byte[]> actual = userService.getAvatar(USER_1_ID);
 
         assertThat(actual).isPresent();
+    }
+
+    @Test
+    void loadUserByUsername() {
+        UserDetails userDetails = userService.loadUserByUsername(USER_1_USERNAME);
+
+        assertThat(userDetails)
+                .hasFieldOrPropertyWithValue("username", USER_1_USERNAME);
     }
 
     @NotNull

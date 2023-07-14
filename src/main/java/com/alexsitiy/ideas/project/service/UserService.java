@@ -2,6 +2,7 @@ package com.alexsitiy.ideas.project.service;
 
 import com.alexsitiy.ideas.project.dto.UserFullReadDto;
 import com.alexsitiy.ideas.project.dto.UserReadDto;
+import com.alexsitiy.ideas.project.dto.UserUpdateDto;
 import com.alexsitiy.ideas.project.entity.User;
 import com.alexsitiy.ideas.project.mapper.Mapper;
 import com.alexsitiy.ideas.project.mapper.UserFullReadMapper;
@@ -26,15 +27,27 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class UserService implements UserDetailsService {
 
-    private final UserRepository userRepository;
-
     private final S3Service s3Service;
 
-    private final UserReadMapper userReadMapper;
+    private final UserRepository userRepository;
+
     private final UserFullReadMapper userFullReadMapper;
 
     public Optional<UserFullReadDto> findById(Integer id) {
         return userRepository.findById(id)
+                .map(userFullReadMapper::map);
+    }
+
+    @Transactional
+    public Optional<UserFullReadDto> update(Integer id, UserUpdateDto updateDto) {
+        return userRepository.findById(id)
+                .map(user -> {
+                    user.setFirstname(updateDto.getFirstname());
+                    user.setLastname(updateDto.getLastname());
+                    userRepository.saveAndFlush(user);
+                    log.debug("User: {} was updated", user);
+                    return user;
+                })
                 .map(userFullReadMapper::map);
     }
 
@@ -50,16 +63,16 @@ public class UserService implements UserDetailsService {
                 });
     }
 
+    public Optional<byte[]> getAvatar(Integer userId) {
+        return userRepository.findById(userId)
+                .flatMap(user -> s3Service.download(user.getAvatar(), User.class));
+
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .map(SecurityUser::of)
                 .orElseThrow(() -> new UsernameNotFoundException("There is no user with username:" + username));
-    }
-
-    public Optional<byte[]> getAvatar(Integer userId) {
-        return userRepository.findById(userId)
-                .flatMap(user -> s3Service.download(user.getAvatar(), User.class));
-
     }
 }

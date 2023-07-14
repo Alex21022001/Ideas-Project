@@ -1,5 +1,6 @@
 package com.alexsitiy.ideas.project.integration.controller;
 
+import com.alexsitiy.ideas.project.dto.UserUpdateDto;
 import com.alexsitiy.ideas.project.entity.User;
 import com.alexsitiy.ideas.project.service.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RequiredArgsConstructor
@@ -45,6 +45,32 @@ class UserRestControllerTest extends RestIntegrationTestBase {
                 .andExpectAll(
                         jsonPath("id").value(1)
                 );
+    }
+
+    @Test
+    void update() throws Exception {
+        UserUpdateDto updateDto = new UserUpdateDto("newFirstname", "newLastname");
+
+        mockMvc.perform(put("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(updateDto)))
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("id").value(USER_1_ID),
+                        jsonPath("firstname").value(updateDto.getFirstname()),
+                        jsonPath("lastname").value(updateDto.getLastname())
+                );
+    }
+
+    @Test
+    void updateWithInvalidData() throws Exception {
+        UserUpdateDto updateDto = new UserUpdateDto("", "1");
+
+        mockMvc.perform(put("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(updateDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("violations", hasSize(3)));
     }
 
     @Test

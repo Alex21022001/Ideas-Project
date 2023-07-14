@@ -2,6 +2,7 @@ package com.alexsitiy.ideas.project.controller;
 
 import com.alexsitiy.ideas.project.dto.UserFullReadDto;
 import com.alexsitiy.ideas.project.dto.UserReadDto;
+import com.alexsitiy.ideas.project.dto.UserUpdateDto;
 import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.UserService;
 import com.alexsitiy.ideas.project.validation.ContentType;
@@ -29,6 +30,14 @@ public class UserRestController {
         return userService.findById(user.getId())
                 .map(ResponseEntity::ok)
                 .orElseGet(ResponseEntity.badRequest()::build);
+    }
+
+    @PutMapping
+    public ResponseEntity<UserFullReadDto> update(@RequestBody @Validated UserUpdateDto updateDto,
+                                                  @AuthenticationPrincipal SecurityUser user) {
+        return userService.update(user.getId(), updateDto)
+                .map(ResponseEntity::ok)
+                .orElseGet(ResponseEntity.notFound()::build);
     }
 
     @PutMapping("/avatar")

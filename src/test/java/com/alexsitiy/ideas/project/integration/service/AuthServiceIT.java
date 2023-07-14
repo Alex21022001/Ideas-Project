@@ -18,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor
 class AuthServiceIT extends IntegrationTestBase {
 
+    private static final Integer NEXT_USER_ID = 3;
+
     private final AuthService authService;
     private final UserRepository userRepository;
     private final EntityManager entityManager;
@@ -32,7 +34,7 @@ class AuthServiceIT extends IntegrationTestBase {
         Optional<User> maybeUser = userRepository.findByUsername(username);
 
         assertThat(maybeUser).isPresent()
-                        .map(User::getId).get().isEqualTo(3);
+                        .map(User::getId).get().isEqualTo(NEXT_USER_ID);
         assertThat(expected).isNotNull()
                 .hasFieldOrProperty("token").isNotNull();
     }
