@@ -12,11 +12,10 @@ public class IdeasProjectApplication {
 
     public static void main(String[] args) {
         // TODO: 11.07.2023
-        //  User Avatar (not required, can use default avatar) +
-        //  Add getAvatar()
         //  Add User update feature
-        //  Add User update Avatar Test
-        //  Change ConstraintViolationException handler +
+        //  Random Default Avatar feature
+        //
+        //  Add Project.getImage() + Project.getDoc() + Tests
         //
         //  User's liked and disliked projects
         //

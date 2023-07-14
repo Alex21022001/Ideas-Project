@@ -9,6 +9,6 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 @TestConfiguration
 public class TestSpringSecurityApplication {
 
-    @MockBean
+    @SpyBean
     private S3Service s3Service;
 }

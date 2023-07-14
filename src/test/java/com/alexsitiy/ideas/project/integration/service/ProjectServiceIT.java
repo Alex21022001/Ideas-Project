@@ -6,33 +6,27 @@ import com.alexsitiy.ideas.project.integration.IntegrationTestBase;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.service.S3Service;
-import com.querydsl.core.Tuple;
-import com.querydsl.jpa.impl.JPAQuery;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.assertj.core.api.InstanceOfAssertFactory;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 
 @RequiredArgsConstructor
-class ProjectServiceTest extends IntegrationTestBase {
+class ProjectServiceIT extends IntegrationTestBase {
+
+    private static final Integer PROJECT_ID = 1;
+    private static final Integer NEXT_PROJECT_ID = 4;
+    private static final Integer USER_1_ID = 1;
 
     private final ProjectService projectService;
     private final S3Service s3Service;
@@ -42,33 +36,31 @@ class ProjectServiceTest extends IntegrationTestBase {
 
     @Test
     void create() {
-        int userId = 1;
         ProjectCreateDto createDto = getCreateDto();
         String imagePath = "newPath.png";
 
         doReturn(Optional.of(imagePath)).when(s3Service).upload(any(), eq(Project.class));
 
-        Optional<ProjectReadDto> actual = projectService.create(createDto, userId);
+        Optional<ProjectReadDto> actual = projectService.create(createDto, USER_1_ID);
 
         assertThat(actual).isPresent()
                 .get()
-                .hasFieldOrPropertyWithValue("id", 4)
+                .hasFieldOrPropertyWithValue("id", NEXT_PROJECT_ID)
                 .hasFieldOrPropertyWithValue("image", imagePath)
                 .extracting("creator", as(InstanceOfAssertFactories.type(UserReadDto.class)))
-                .isNotNull().hasFieldOrPropertyWithValue("id", userId);
+                .isNotNull().hasFieldOrPropertyWithValue("id", USER_1_ID);
     }
 
     @Test
     void update() {
-        int projectId = 1;
         String title = "New title";
         String description = "Something";
 
-        Optional<ProjectReadDto> actual = projectService.update(projectId, new ProjectUpdateDto(title, description));
+        Optional<ProjectReadDto> actual = projectService.update(PROJECT_ID, new ProjectUpdateDto(title, description));
 
         assertThat(actual).isPresent()
                 .get()
-                .hasFieldOrPropertyWithValue("id", projectId)
+                .hasFieldOrPropertyWithValue("id", PROJECT_ID)
                 .hasFieldOrPropertyWithValue("title", title)
                 .hasFieldOrPropertyWithValue("description", description);
     }
@@ -95,17 +87,6 @@ class ProjectServiceTest extends IntegrationTestBase {
                 .hasFieldOrPropertyWithValue("likes", 1)
                 .hasFieldOrPropertyWithValue("dislikes", 1);
     }
-
-//    @Test
-//    void findAll() {
-//        List<Tuple> projects = projectRepository.findAllProjectsWithLikesAndDislikes();
-//        projects.stream().map(tuple -> {
-//            Project project = tuple.get(0, Project.class);
-//            Integer likes = tuple.get(1, Integer.class);
-//            Integer dislikes = tuple.get(2, Integer.class);
-//            return new ProjectProjection(project, likes, dislikes);
-//        }).forEach(System.out::println);
-//    }
 
     @NotNull
     private ProjectCreateDto getCreateDto() {

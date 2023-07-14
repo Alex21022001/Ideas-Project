@@ -8,6 +8,7 @@ import com.alexsitiy.ideas.project.validation.ContentType;
 import com.alexsitiy.ideas.project.validation.FileCheck;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,7 +44,11 @@ public class UserRestController {
     @GetMapping("/{id}/avatar")
     public ResponseEntity<byte[]> getAvatar(@PathVariable("id") Integer userId) {
         return userService.getAvatar(userId)
-                .map(ResponseEntity::ok)
+                .map(bytes -> ResponseEntity
+                        .status(200)
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .contentLength(bytes.length)
+                        .body(bytes))
                 .orElseGet(ResponseEntity.notFound()::build);
     }
 }

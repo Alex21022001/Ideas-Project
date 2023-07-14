@@ -1,8 +1,8 @@
-INSERT INTO users (id, username, password, firstname, lastname, role)
+INSERT INTO users (id, username, password, firstname, lastname, role, avatar)
 VALUES (1, 'test1@gmail.com', '{bcrypt}$2a$10$4MZmbaXMS4An5Ne0Rq2Fs.9JNJZVOtAKO3yQWOpZI7dKknEvTNGYW',
-        'Test', 'Test', 'USER'),
+        'Test', 'Test', 'USER', 'test1Avatar.png'),
        (2, 'test2@gmail.com', '{bcrypt}$2a$10$4MZmbaXMS4An5Ne0Rq2Fs.9JNJZVOtAKO3yQWOpZI7dKknEvTNGYW',
-        'TestExpert', 'TestExpert', 'EXPERT');
+        'TestExpert', 'TestExpert', 'EXPERT', 'test2Avatar.png');
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
 
 INSERT INTO project(id, title, description, image_path, docs_path, status, user_id)

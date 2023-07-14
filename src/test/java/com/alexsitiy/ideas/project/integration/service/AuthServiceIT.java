@@ -9,19 +9,14 @@ import com.alexsitiy.ideas.project.security.RegisterRequest;
 import com.alexsitiy.ideas.project.service.AuthService;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.Condition;
-import org.assertj.core.condition.AllOf;
-import org.assertj.core.internal.Conditions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @RequiredArgsConstructor
-class AuthServiceTest extends IntegrationTestBase {
+class AuthServiceIT extends IntegrationTestBase {
 
     private final AuthService authService;
     private final UserRepository userRepository;

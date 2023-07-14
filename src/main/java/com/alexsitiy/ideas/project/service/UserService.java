@@ -33,11 +33,6 @@ public class UserService implements UserDetailsService {
     private final UserReadMapper userReadMapper;
     private final UserFullReadMapper userFullReadMapper;
 
-    public Optional<UserReadDto> findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .map(userReadMapper::map);
-    }
-
     public Optional<UserFullReadDto> findById(Integer id) {
         return userRepository.findById(id)
                 .map(userFullReadMapper::map);
