@@ -61,4 +61,10 @@ public class UserService implements UserDetailsService {
                 .map(SecurityUser::of)
                 .orElseThrow(() -> new UsernameNotFoundException("There is no user with username:" + username));
     }
+
+    public Optional<byte[]> getAvatar(Integer userId) {
+        return userRepository.findById(userId)
+                .flatMap(user -> s3Service.download(user.getAvatar(), User.class));
+
+    }
 }

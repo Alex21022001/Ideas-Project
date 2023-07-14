@@ -39,4 +39,11 @@ public class UserRestController {
         userService.updateAvatar(user.getId(), image);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/avatar")
+    public ResponseEntity<byte[]> getAvatar(@PathVariable("id") Integer userId) {
+        return userService.getAvatar(userId)
+                .map(ResponseEntity::ok)
+                .orElseGet(ResponseEntity.notFound()::build);
+    }
 }

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -45,8 +46,10 @@ public class SecurityConfiguration {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(url-> url
-                        .requestMatchers(antMatcher("/auth/**")).permitAll()
+                .authorizeHttpRequests(url -> url
+                        .requestMatchers(antMatcher("/auth/**"),
+                                antMatcher(HttpMethod.GET, "/api/v1/users/{id}/avatar"),
+                                antMatcher(HttpMethod.GET, "/api/v1/projects/{id}/avatar")).permitAll()
                         .requestMatchers(antMatcher("/api/v1/**")).authenticated()
                         .anyRequest().authenticated()
                 )
@@ -68,7 +71,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(){
+    public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsServiceService);
         authProvider.setPasswordEncoder(passwordEncoder());
@@ -76,7 +79,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }

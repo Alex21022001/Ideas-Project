@@ -8,8 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
@@ -32,12 +35,30 @@ public class S3Service {
 
     private final S3Client s3Client;
 
+    public Optional<byte[]> download(String filename, Class<?> clazz) {
+        String path = buildPath(filename, clazz);
+        return download(path);
+    }
+
     public Optional<String> upload(MultipartFile file, Class<?> clazz) {
         String uniqueName = generateUniqueName(file.getOriginalFilename());
         String path = buildPath(uniqueName, clazz);
 
         upload(file, path);
         return Optional.of(uniqueName);
+    }
+
+    private Optional<byte[]> download(String path) {
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .key(path)
+                .bucket(BUCKET)
+                .build();
+        try (ResponseInputStream<GetObjectResponse> result = s3Client.getObject(getObjectRequest)) {
+            return Optional.ofNullable(result.readAllBytes());
+        } catch (IOException | S3Exception ex) {
+            log.error("Couldn't read a File by Path: {}. Exception: {}", path, ex.getMessage());
+        }
+        return Optional.empty();
     }
 
     private void upload(MultipartFile file, String path) throws UploadingFileException {

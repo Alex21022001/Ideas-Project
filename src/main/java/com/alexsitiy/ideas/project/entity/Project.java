@@ -43,7 +43,7 @@ public class Project {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne(mappedBy = "project", optional = false, cascade = CascadeType.PERSIST,fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "project", optional = false, cascade = CascadeType.PERSIST)
     private Reaction reaction;
 
     @Builder.Default
