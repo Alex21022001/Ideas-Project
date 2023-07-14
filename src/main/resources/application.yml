@@ -1,6 +1,6 @@
 app:
   user:
-    default-avatar: DefaultUserAvatar.png
+    default-avatars: defaultAvatar_1.png, defaultAvatar_2.png, defaultAvatar_3.png
 
 spring:
   datasource:

@@ -2,6 +2,7 @@ package com.alexsitiy.ideas.project.service;
 
 import com.alexsitiy.ideas.project.entity.Role;
 import com.alexsitiy.ideas.project.entity.User;
+import com.alexsitiy.ideas.project.mapper.RegisterMapper;
 import com.alexsitiy.ideas.project.repository.UserRepository;
 import com.alexsitiy.ideas.project.security.AuthenticationRequest;
 import com.alexsitiy.ideas.project.security.AuthenticationResponse;
@@ -26,25 +27,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final String JWT_TYPE = "Bearer ";
-    @Value("${app.user.default-avatar}")
-    private final String USER_DEFAULT_AVATAR;
 
     private final UserRepository userRepository;
 
+    private final RegisterMapper registerMapper;
+
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtil jwtUtil;
 
     @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
-        User user = User.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .avatar(USER_DEFAULT_AVATAR)
-                .build();
+        User user = registerMapper.map(request);
 
         User savedUser = userRepository.save(user);
         log.debug("User {} was created", savedUser);

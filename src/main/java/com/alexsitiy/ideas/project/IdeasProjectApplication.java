@@ -12,12 +12,10 @@ public class IdeasProjectApplication {
 
     public static void main(String[] args) {
         // TODO: 11.07.2023
-        //  Add User update feature
-        //  Random Default Avatar feature
+        //  User's liked and disliked projects
         //
         //  Add Project.getImage() + Project.getDoc() + Tests
         //
-        //  User's liked and disliked projects
         //
         //  Add Project created_at in order to see a new Project and add title "NEW" on Front
         //  Add getProjectImage() and getProjectDoc()
