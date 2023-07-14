@@ -13,7 +13,7 @@ public class IdeasProjectApplication {
     public static void main(String[] args) {
         // TODO: 11.07.2023
         //  User's liked and disliked projects
-        //
+        //  Change ContentType in FileCheck
         //  Add Project.getImage() + Project.getDoc() + Tests
         //
         //

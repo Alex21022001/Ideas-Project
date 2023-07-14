@@ -1,6 +1,9 @@
 package com.alexsitiy.ideas.project.integration.controller;
 
+import com.alexsitiy.ideas.project.dto.PageResponse;
+import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
+import com.alexsitiy.ideas.project.dto.SortRequest;
 import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.entity.Role;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
@@ -10,8 +13,11 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,6 +25,7 @@ import static org.hamcrest.Matchers.*;
 
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Collections;
@@ -42,17 +49,62 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
     @Test
     void findAll() throws Exception {
         mockMvc.perform(get("/api/v1/projects")
-                .param("page","0")
-                .param("size","2")
-                .param("sort","likes")
-                .param("title","test"))
+                        .param("page", "0")
+                        .param("size", "2")
+                        .param("sort", "likes")
+                        .param("title", "test"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("data", hasSize(2)),
+                        jsonPath("metadata.currentPage").value(0),
+                        jsonPath("metadata.totalPages").value(2),
+                        jsonPath("metadata.totalElements").value(3));
+
+    }
+
+    @Test
+    void findAllByUser() throws Exception {
+        mockMvc.perform(get("/api/v1/projects/user")
+                        .queryParam("page", "0")
+                        .queryParam("size", "1")
+                        .queryParam("sort", "dislikes"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("data",hasSize(1)),
+                        jsonPath("metadata.currentPage").value(0),
+                        jsonPath("metadata.totalPages").value(2),
+                        jsonPath("metadata.totalElements").value(2)
+                );
+    }
+
+    @Test
+    void findAllLikedProjectsByUser() throws Exception {
+        mockMvc.perform(get("/api/v1/projects/user/liked")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sort", "dislikes"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpectAll(
                         jsonPath("data",hasSize(2)),
-                        jsonPath("metadata.currentPage").value("0"),
-                        jsonPath("metadata.totalPages").value("2"),
-                        jsonPath("metadata.totalElements").value("3"));
+                        jsonPath("metadata.currentPage").value(0),
+                        jsonPath("metadata.totalPages").value(1),
+                        jsonPath("metadata.totalElements").value(2)
+                );
+    }
 
+    @Test
+    void findAllDislikedProjectsByUser() throws Exception {
+        mockMvc.perform(get("/api/v1/projects/user/disliked")
+                        .queryParam("page", "0")
+                        .queryParam("size", "2")
+                        .queryParam("sort", "dislikes"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("data",hasSize(1)),
+                        jsonPath("metadata.currentPage").value(0),
+                        jsonPath("metadata.totalPages").value(1),
+                        jsonPath("metadata.totalElements").value(1)
+                );
     }
 
     @Test

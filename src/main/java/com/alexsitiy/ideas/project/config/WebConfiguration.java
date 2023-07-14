@@ -24,6 +24,9 @@ public class WebConfiguration implements WebMvcConfigurer {
 
 
     static class SortRequestMethodArgumentResolver implements HandlerMethodArgumentResolver {
+        private static final Integer DEFAULT_PAGE = 0;
+        private static final Integer DEFAULT_SIZE = 20;
+        private static final String DEFAULT_SORT = "likes";
 
         @Override
         public boolean supportsParameter(MethodParameter parameter) {
@@ -39,9 +42,9 @@ public class WebConfiguration implements WebMvcConfigurer {
             String maybeSize = webRequest.getParameter("size");
             String[] mayBeSortList = webRequest.getParameterValues("sort");
 
-            int page = maybePage == null ? 0 : Integer.parseInt(maybePage);
-            int size = maybeSize == null ? 20 : Integer.parseInt(maybeSize);
-            List<String> sortList = mayBeSortList == null ? List.of("likes") : Arrays.asList(mayBeSortList);
+            int page = maybePage == null ? DEFAULT_PAGE : Integer.parseInt(maybePage);
+            int size = maybeSize == null ? DEFAULT_SIZE : Integer.parseInt(maybeSize);
+            List<String> sortList = mayBeSortList == null ? List.of(DEFAULT_SORT) : Arrays.asList(mayBeSortList);
 
             return new SortRequest(page, size, sortList);
         }
