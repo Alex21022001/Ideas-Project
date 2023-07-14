@@ -24,21 +24,7 @@ public class ExceptionHandlingControllerAdvice {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException violationException) {
-
-        Set<ConstraintViolation<?>> constraintViolations = violationException.getConstraintViolations();
-
-        // Process the constraint violations and retrieve validation data
-        List<String> validationErrors = new ArrayList<>();
-        for (ConstraintViolation<?> violation : constraintViolations) {
-            String errorMessage = violation.getMessage();
-            String propertyPath = violation.getPropertyPath().toString();
-            // You can access more details like the invalid value, constraint type, etc.
-
-            // Add the validation error message to the list
-            validationErrors.add(propertyPath + ": " + errorMessage);
-        }
-
-        return ResponseEntity.badRequest().body(validationErrors);
+        return ResponseEntity.badRequest().body(ValidationErrorResponse.of(violationException.getConstraintViolations()));
     }
 
     @ExceptionHandler({UploadingFileException.class})
