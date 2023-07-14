@@ -58,6 +58,22 @@ public class ProjectService {
                 .map(projectReadMapper::map);
     }
 
+    public Page<ProjectReadDto> findAllByUserId(Integer id, Pageable pageable) {
+        return projectRepository.findAllByUserId(id, pageable)
+                .map(projectReadMapper::map);
+    }
+
+    public Page<ProjectReadDto> findAllLikedByUserId(Integer id, Pageable pageable) {
+        return projectRepository.findAllCommentedByUserIdAndCommentType(id, CommentType.LIKE, pageable)
+                .map(projectReadMapper::map);
+    }
+
+    public Page<ProjectReadDto> findAllDislikedByUserId(Integer id, Pageable pageable) {
+        return projectRepository.findAllCommentedByUserIdAndCommentType(id, CommentType.DISLIKE, pageable)
+                .map(projectReadMapper::map);
+    }
+
+
     @Transactional
     public Optional<ProjectReadDto> create(ProjectCreateDto projectDto, Integer userId) {
         return userRepository.findById(userId)
@@ -192,6 +208,7 @@ public class ProjectService {
         reactionRepository.saveAndFlush(reaction);
         log.debug("User with ID: {} {}ED Project: {}. Current Reactions: {}", userId, commentType, projectId, reaction);
     }
+
 }
 
 

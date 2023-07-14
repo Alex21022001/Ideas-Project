@@ -45,16 +45,38 @@ public class ProjectsRestController {
 
     @GetMapping
     public ResponseEntity<PageResponse<ProjectReadDto>> findAll(ProjectFilter filter,
-                                                                @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-                                                                @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
-                                                                @RequestParam(value = "sort", required = false, defaultValue = "likes") List<String> sortList) {
+                                                                SortRequest sortRequest) {
 
-        Sort sort = buildSort(sortList);
-        PageRequest pageable = PageRequest.of(page, size, sort);
-
-        Page<ProjectReadDto> projectReadPage = projectService.findAll(filter, pageable);
+        Page<ProjectReadDto> projectReadPage = projectService.findAll(filter, sortRequest.getPageable());
 
         return ResponseEntity.ok(PageResponse.of(projectReadPage));
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<PageResponse<ProjectReadDto>> findAllByUser(@AuthenticationPrincipal SecurityUser user,
+                                                                      SortRequest sort) {
+
+        Page<ProjectReadDto> projects = projectService.findAllByUserId(user.getId(), sort.getPageable());
+
+        return ResponseEntity.ok(PageResponse.of(projects));
+    }
+
+    @GetMapping("/user/liked")
+    public ResponseEntity<PageResponse<ProjectReadDto>> findAllLikedProjectsByUser(@AuthenticationPrincipal SecurityUser user,
+                                                                                   SortRequest sort) {
+
+        Page<ProjectReadDto> projects = projectService.findAllLikedByUserId(user.getId(), sort.getPageable());
+
+        return ResponseEntity.ok(PageResponse.of(projects));
+    }
+
+    @GetMapping("/user/disliked")
+    public ResponseEntity<PageResponse<ProjectReadDto>> findAllDislikedProjectsByUser(@AuthenticationPrincipal SecurityUser user,
+                                                                                      SortRequest sort) {
+
+        Page<ProjectReadDto> projects = projectService.findAllDislikedByUserId(user.getId(), sort.getPageable());
+
+        return ResponseEntity.ok(PageResponse.of(projects));
     }
 
     @PostMapping
@@ -127,17 +149,4 @@ public class ProjectsRestController {
         return ResponseEntity.notFound().build();
     }
 
-    private Sort buildSort(List<String> sortList) {
-        List<Sort.Order> sortOrderList = new ArrayList<>();
-
-        for (String sort : sortList) {
-            switch (sort) {
-                case "likes" -> sortOrderList.add(Sort.Order.desc("reaction.likes"));
-                case "dislikes" -> sortOrderList.add(Sort.Order.desc("reaction.dislikes"));
-                case "title" -> sortOrderList.add(Sort.Order.asc("title"));
-            }
-        }
-
-        return Sort.by(sortOrderList);
-    }
 }
