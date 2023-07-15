@@ -32,6 +32,17 @@ public class UserRestController {
                 .orElseGet(ResponseEntity.badRequest()::build);
     }
 
+    @GetMapping("/{id}/avatar")
+    public ResponseEntity<byte[]> getAvatar(@PathVariable("id") Integer userId) {
+        return userService.getAvatar(userId)
+                .map(bytes -> ResponseEntity
+                        .status(200)
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .contentLength(bytes.length)
+                        .body(bytes))
+                .orElseGet(ResponseEntity.notFound()::build);
+    }
+
     @PutMapping
     public ResponseEntity<UserFullReadDto> update(@RequestBody @Validated UserUpdateDto updateDto,
                                                   @AuthenticationPrincipal SecurityUser user) {
@@ -50,14 +61,4 @@ public class UserRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}/avatar")
-    public ResponseEntity<byte[]> getAvatar(@PathVariable("id") Integer userId) {
-        return userService.getAvatar(userId)
-                .map(bytes -> ResponseEntity
-                        .status(200)
-                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                        .contentLength(bytes.length)
-                        .body(bytes))
-                .orElseGet(ResponseEntity.notFound()::build);
-    }
 }

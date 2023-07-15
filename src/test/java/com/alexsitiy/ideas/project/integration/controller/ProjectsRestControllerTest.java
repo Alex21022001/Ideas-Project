@@ -1,9 +1,6 @@
 package com.alexsitiy.ideas.project.integration.controller;
 
-import com.alexsitiy.ideas.project.dto.PageResponse;
-import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
-import com.alexsitiy.ideas.project.dto.SortRequest;
 import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.entity.Role;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
@@ -13,35 +10,30 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.test.web.servlet.MockMvc;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
-
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Collections;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RequiredArgsConstructor
 class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
+    private static final Integer PROJECT_1_ID = 1;
+    
     private final MockMvc mockMvc;
     private final S3Service s3Service;
     private final ProjectRepository projectRepository;
@@ -106,6 +98,43 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                         jsonPath("metadata.totalElements").value(1)
                 );
     }
+    
+    @Test
+    void getImage() throws Exception {
+
+        doReturn(Optional.of(new byte[1230])).when(s3Service).download(any(),eq(Project.class));
+
+        mockMvc.perform(get("/api/v1/projects/{id}/image",PROJECT_1_ID)
+                .accept(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM));
+
+    }
+
+    @Test
+    void getImageByInvalidProjectId() throws Exception {
+        mockMvc.perform(get("/api/v1/projects/{id}/image",-1)
+                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getDoc() throws Exception {
+
+        doReturn(Optional.of(new byte[1230])).when(s3Service).download(any(),eq(Project.class));
+
+        mockMvc.perform(get("/api/v1/projects/{id}/doc",PROJECT_1_ID)
+                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM));
+    }
+
+    @Test
+    void getDocByInvalidProjectId() throws Exception {
+        mockMvc.perform(get("/api/v1/projects/{id}/doc",-1)
+                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                .andExpect(status().isNotFound());
+    }
 
     @Test
     void create() throws Exception {
@@ -150,34 +179,32 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     @Test
     void update() throws Exception {
-        int projectId = 1;
         SecurityUser user = getUserDetails();
         String title = "New title";
         String description = "Something";
 
         ProjectUpdateDto updateDto = new ProjectUpdateDto(title, description);
 
-        mockMvc.perform(put("/api/v1/projects/{id}", projectId)
+        mockMvc.perform(put("/api/v1/projects/{id}", PROJECT_1_ID)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(updateDto))
                         .with(user(user)))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("id").value(projectId))
+                .andExpect(jsonPath("id").value(PROJECT_1_ID))
                 .andExpect(jsonPath("title").value(title))
                 .andExpect(jsonPath("description").value(description));
     }
 
     @Test
     void updateWithInvalidData() throws Exception {
-        int projectId = 1;
         SecurityUser user = getUserDetails();
         String title = "";
         String description = RandomStringUtils.random(257);
 
         ProjectUpdateDto updateDto = new ProjectUpdateDto(title, description);
 
-        mockMvc.perform(put("/api/v1/projects/{id}", projectId)
+        mockMvc.perform(put("/api/v1/projects/{id}", PROJECT_1_ID)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(updateDto))
@@ -188,20 +215,19 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     @Test
     void updateImage() throws Exception {
-        int projectId = 1;
         String newImagePath = "newImagePth";
         MockMultipartFile image = getImageFile();
 
         doReturn(Optional.of(newImagePath)).when(s3Service).upload(image, Project.class);
 
-        mockMvc.perform(multipart("/api/v1/projects/{id}/image", projectId)
+        mockMvc.perform(multipart("/api/v1/projects/{id}/image", PROJECT_1_ID)
                         .file(image)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .with(getRequestPostProcessor())
                 )
                 .andExpect(status().is(205));
 
-        Optional<Project> actual = projectRepository.findById(projectId);
+        Optional<Project> actual = projectRepository.findById(PROJECT_1_ID);
         assertThat(actual).isPresent()
                 .map(Project::getImagePath)
                 .get().isEqualTo(newImagePath);
@@ -210,10 +236,9 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     @Test
     void updateInvalidImage() throws Exception {
-        int projectId = 1;
         MockMultipartFile image = new MockMultipartFile("image", "image-gif.gif", "image/gif", new byte[]{});
 
-        mockMvc.perform(multipart("/api/v1/projects/{id}/image", projectId)
+        mockMvc.perform(multipart("/api/v1/projects/{id}/image", PROJECT_1_ID)
                         .file(image)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .with(getRequestPostProcessor())
@@ -223,20 +248,19 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     @Test
     void updateDoc() throws Exception {
-        int projectId = 1;
         String newDocPath = "newDocPath";
         MockMultipartFile docFile = getDocFile();
 
         doReturn(Optional.of(newDocPath)).when(s3Service).upload(docFile, Project.class);
 
-        mockMvc.perform(multipart("/api/v1/projects/{id}/doc", projectId)
+        mockMvc.perform(multipart("/api/v1/projects/{id}/doc", PROJECT_1_ID)
                         .file(docFile)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .with(getRequestPostProcessor())
                 )
                 .andExpect(status().is(205));
 
-        Optional<Project> actual = projectRepository.findById(projectId);
+        Optional<Project> actual = projectRepository.findById(PROJECT_1_ID);
         assertThat(actual).isPresent()
                 .map(Project::getDocPath)
                 .get().isEqualTo(newDocPath);
@@ -244,10 +268,9 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     @Test
     void updateInvalidDoc() throws Exception {
-        int projectId = 1;
         MockMultipartFile image = new MockMultipartFile("doc", "doc-gif.gif", "image/gif", new byte[]{});
 
-        mockMvc.perform(multipart("/api/v1/projects/{id}/doc", projectId)
+        mockMvc.perform(multipart("/api/v1/projects/{id}/doc", PROJECT_1_ID)
                         .file(image)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .with(getRequestPostProcessor())
@@ -257,17 +280,13 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     @Test
     void delete() throws Exception {
-        int projectId = 1;
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/projects/{id}", projectId))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/projects/{id}", PROJECT_1_ID))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void likeProject() throws Exception {
-        int projectId = 1;
-
-        mockMvc.perform(post("/api/v1/projects/{id}/like", projectId))
+        mockMvc.perform(post("/api/v1/projects/{id}/like", PROJECT_1_ID))
                 .andExpect(status().isNoContent());
     }
 
@@ -281,9 +300,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     @Test
     void dislikeProject() throws Exception {
-        int projectId = 1;
-
-        mockMvc.perform(post("/api/v1/projects/{id}/dislike", projectId))
+        mockMvc.perform(post("/api/v1/projects/{id}/dislike", PROJECT_1_ID))
                 .andExpect(status().isNoContent());
     }
 

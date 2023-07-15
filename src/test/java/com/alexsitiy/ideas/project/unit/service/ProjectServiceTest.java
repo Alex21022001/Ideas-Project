@@ -30,6 +30,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ProjectServiceTest {
 
+    private static final Integer PROJECT_1_ID = 1;
+
     @InjectMocks
     private ProjectService projectService;
     @Mock
@@ -56,6 +58,31 @@ class ProjectServiceTest {
     private ArgumentCaptor<Comment> commentCaptor;
     @Captor
     private ArgumentCaptor<Reaction> reactionCaptor;
+
+
+    @Test
+    void downloadImage() {
+        Project project = getProject();
+
+        doReturn(Optional.of(project)).when(projectRepository).findById(PROJECT_1_ID);
+        doReturn(Optional.of(new byte[123])).when(s3Service).download(any(), eq(Project.class));
+
+        Optional<byte[]> actual = projectService.downloadImage(PROJECT_1_ID);
+
+        assertThat(actual).isPresent();
+    }
+
+    @Test
+    void downloadDocIfItNOTExist() {
+        Project project = getProject(PROJECT_1_ID, null);
+
+        doReturn(Optional.of(project)).when(projectRepository).findById(PROJECT_1_ID);
+
+        Optional<byte[]> actual = projectService.downloadDoc(PROJECT_1_ID);
+
+        assertThat(actual).isEmpty();
+        verify(s3Service, never()).download(any(), eq(Project.class));
+    }
 
 
     @Test
@@ -96,46 +123,45 @@ class ProjectServiceTest {
 
     @Test
     void update() {
-        int projectId = 1;
         String title = "New Project";
         String description = "Something";
 
         ProjectUpdateDto updateDto = new ProjectUpdateDto(title, description);
-        Project project = getProject(projectId);
+        Project project = getProject();
 
-        doReturn(Optional.of(project)).when(projectRepository).findByIdWithUserAndReaction(projectId);
+        doReturn(Optional.of(project)).when(projectRepository).findByIdWithUserAndReaction(PROJECT_1_ID);
         doReturn(Project.builder()
-                .id(projectId)
+                .id(PROJECT_1_ID)
                 .title(title)
                 .description(description)
                 .build()).when(projectRepository).saveAndFlush(project);
         doReturn(ProjectReadDto.builder()
-                .id(projectId)
+                .id(PROJECT_1_ID)
                 .title(title)
                 .description(description)
                 .build()).when(projectReadMapper).map(any());
 
-        Optional<ProjectReadDto> actual = projectService.update(projectId, updateDto);
+        Optional<ProjectReadDto> actual = projectService.update(PROJECT_1_ID, updateDto);
 
         assertThat(actual).isPresent()
                 .get()
                 .hasFieldOrPropertyWithValue("title", title)
-                .hasFieldOrPropertyWithValue("id", projectId)
+                .hasFieldOrPropertyWithValue("id", PROJECT_1_ID)
                 .hasFieldOrPropertyWithValue("description", description);
         verify(projectRepository, times(1)).saveAndFlush(project);
     }
 
     @Test
     void updateImage() {
-        int projectId = 1;
+
         MockMultipartFile image = new MockMultipartFile(
                 "image",
                 "new-image.png",
                 "image/png", new byte[123]);
         String newImagePath = "newImagePath";
-        Project project = getProject(projectId);
+        Project project = getProject();
 
-        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+        doReturn(Optional.of(project)).when(projectRepository).findById(PROJECT_1_ID);
         doReturn(Optional.of(newImagePath)).when(s3Service).upload(image, Project.class);
 
         projectService.updateImage(1, image);
@@ -144,22 +170,21 @@ class ProjectServiceTest {
         verify(projectRepository, times(1)).saveAndFlush(projectCaptor.capture());
         Project actual = projectCaptor.getValue();
         assertThat(actual).isNotNull()
-                .hasFieldOrPropertyWithValue("id", projectId)
+                .hasFieldOrPropertyWithValue("id", PROJECT_1_ID)
                 .hasFieldOrPropertyWithValue("imagePath", newImagePath);
     }
 
 
     @Test
     void updateDoc() {
-        int projectId = 1;
         MockMultipartFile doc = new MockMultipartFile(
                 "doc",
                 "new-doc.pdf",
                 "application/pdf", new byte[123]);
         String newDocPath = "newDocPath";
-        Project project = getProject(projectId);
+        Project project = getProject();
 
-        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+        doReturn(Optional.of(project)).when(projectRepository).findById(PROJECT_1_ID);
         doReturn(Optional.of(newDocPath)).when(s3Service).upload(doc, Project.class);
 
         projectService.updateDoc(1, doc);
@@ -168,18 +193,17 @@ class ProjectServiceTest {
         verify(projectRepository, times(1)).saveAndFlush(projectCaptor.capture());
         Project actual = projectCaptor.getValue();
         assertThat(actual).isNotNull()
-                .hasFieldOrPropertyWithValue("id", projectId)
+                .hasFieldOrPropertyWithValue("id", PROJECT_1_ID)
                 .hasFieldOrPropertyWithValue("docPath", newDocPath);
     }
 
     @Test
     void delete() {
-        int projectId = 1;
-        Project project = getProject(projectId);
+        Project project = getProject();
 
-        doReturn(Optional.of(project)).when(projectRepository).findById(projectId);
+        doReturn(Optional.of(project)).when(projectRepository).findById(PROJECT_1_ID);
 
-        boolean actual = projectService.delete(projectId);
+        boolean actual = projectService.delete(PROJECT_1_ID);
 
         assertThat(actual).isTrue();
         verify(projectRepository, times(1)).delete(projectCaptor.capture());
@@ -190,15 +214,14 @@ class ProjectServiceTest {
     @Test
     void likeProjectWithoutComment() {
         int userId = 1;
-        int projectId = 1;
 
-        Reaction reaction = getReaction(getProject(projectId));
+        Reaction reaction = getReaction(getProject());
 
-        doReturn(true).when(projectRepository).existsById(projectId);
-        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(projectId);
-        doReturn(Optional.empty()).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
+        doReturn(true).when(projectRepository).existsById(PROJECT_1_ID);
+        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(PROJECT_1_ID);
+        doReturn(Optional.empty()).when(commentRepository).findCommentByProjectIdAndUserId(PROJECT_1_ID, userId);
 
-        boolean actual = projectService.likeProject(projectId, userId);
+        boolean actual = projectService.likeProject(PROJECT_1_ID, userId);
 
         Assertions.assertTrue(actual);
         verify(commentRepository, times(1)).save(commentCaptor.capture());
@@ -218,21 +241,20 @@ class ProjectServiceTest {
     @Test
     void likeProjectWithLike() {
         int userId = 1;
-        int projectId = 1;
 
-        Project project = getProject(projectId);
+        Project project = getProject();
         Comment comment = getComment(userId, project, CommentType.LIKE);
         Reaction reaction = getReaction(project);
 
-        doReturn(true).when(projectRepository).existsById(projectId);
-        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(projectId);
-        doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
+        doReturn(true).when(projectRepository).existsById(PROJECT_1_ID);
+        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(PROJECT_1_ID);
+        doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(PROJECT_1_ID, userId);
 
-        boolean actual = projectService.likeProject(projectId, userId);
+        boolean actual = projectService.likeProject(PROJECT_1_ID, userId);
 
         Assertions.assertTrue(actual);
         verify(commentRepository, times(1)).delete(commentCaptor.capture());
-        verify(reactionRepository,times(1)).save(reactionCaptor.capture());
+        verify(reactionRepository, times(1)).save(reactionCaptor.capture());
         verify(commentRepository, Mockito.never()).save(any());
         verify(commentRepository, Mockito.never()).saveAndFlush(any());
         assertThat(commentCaptor.getValue())
@@ -247,21 +269,20 @@ class ProjectServiceTest {
     @Test
     void likeProjectWithDislike() {
         int userId = 1;
-        int projectId = 1;
 
-        Project project = getProject(projectId);
+        Project project = getProject();
         Comment comment = getComment(userId, project, CommentType.DISLIKE);
         Reaction reaction = getReaction(project);
 
-        doReturn(true).when(projectRepository).existsById(projectId);
-        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(projectId);
-        doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(projectId, userId);
+        doReturn(true).when(projectRepository).existsById(PROJECT_1_ID);
+        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(PROJECT_1_ID);
+        doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(PROJECT_1_ID, userId);
 
-        boolean actual = projectService.likeProject(projectId, userId);
+        boolean actual = projectService.likeProject(PROJECT_1_ID, userId);
 
         Assertions.assertTrue(actual);
         verify(commentRepository, times(1)).save(commentCaptor.capture());
-        verify(reactionRepository,times(1)).save(reactionCaptor.capture());
+        verify(reactionRepository, times(1)).save(reactionCaptor.capture());
         verify(commentRepository, Mockito.never()).saveAndFlush(any());
         verify(commentRepository, Mockito.never()).delete(any());
         assertThat(commentCaptor.getValue())
@@ -281,13 +302,24 @@ class ProjectServiceTest {
                         .build(), commentType);
     }
 
-    private Project getProject(int projectId) {
+    private Project getProject() {
+        return Project.builder()
+                .id(ProjectServiceTest.PROJECT_1_ID)
+                .title("test1")
+                .description("test1-description")
+                .imagePath("test1.png")
+                .docPath("test1.pdf")
+                .status(Status.WAITING)
+                .build();
+    }
+
+    private Project getProject(int projectId, String doc) {
         return Project.builder()
                 .id(projectId)
                 .title("test1")
                 .description("test1-description")
                 .imagePath("test1.png")
-                .docPath("test1.pdf")
+                .docPath(doc)
                 .status(Status.WAITING)
                 .build();
     }
