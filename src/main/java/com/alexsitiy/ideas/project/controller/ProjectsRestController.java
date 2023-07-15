@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -88,6 +89,28 @@ public class ProjectsRestController {
                 .orElseGet(ResponseEntity.badRequest()::build);
     }
 
+    @GetMapping("/{id}/image")
+    public ResponseEntity<byte[]> getImage(@PathVariable Integer id) {
+        return projectService.downloadImage(id)
+                .map(bytes -> ResponseEntity
+                        .status(200)
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .contentLength(bytes.length)
+                        .body(bytes))
+                .orElseGet(ResponseEntity.notFound()::build);
+    }
+
+    @GetMapping("/{id}/doc")
+    public ResponseEntity<byte[]> getDoc(@PathVariable Integer id) {
+        return projectService.downloadDoc(id)
+                .map(bytes -> ResponseEntity
+                        .status(200)
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .contentLength(bytes.length)
+                        .body(bytes))
+                .orElseGet(ResponseEntity.notFound()::build);
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
     public ResponseEntity<ProjectReadDto> update(@PathVariable("id") Integer id,
@@ -102,7 +125,7 @@ public class ProjectsRestController {
     @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
     public ResponseEntity<?> updateImage(@PathVariable("id") Integer id,
                                          @RequestParam("image")
-                                         @FileCheck(nullable = false, contentType = {"image/png", "image/jpg"})
+                                         @FileCheck(nullable = false, contentType = {"image/png", "image/jpeg"})
                                          MultipartFile file) {
 
         projectService.updateImage(id, file);

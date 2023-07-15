@@ -37,7 +37,7 @@ public class Project {
     private String imagePath;
 
     @Column(name = "docs_path")
-    private String docsPath;
+    private String docPath;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)

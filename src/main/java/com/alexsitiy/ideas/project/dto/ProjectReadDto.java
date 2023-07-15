@@ -16,7 +16,7 @@ public class ProjectReadDto {
     private String title;
     private String description;
     private String image;
-    private String docs;
+    private String doc;
     private Status status;
     private Integer likes;
     private Integer dislikes;

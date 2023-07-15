@@ -23,10 +23,10 @@ public class ProjectCreateDto {
     @Size(max = 256)
     private String description;
 
-    @FileCheck(contentType = {"image/png","image/jpg"},nullable = false)
+    @FileCheck(contentType = {"image/png","image/jpeg"},nullable = false)
     private MultipartFile image;
 
     @FileCheck(contentType = {"application/pdf"})
-    private MultipartFile docs;
+    private MultipartFile doc;
 
 }

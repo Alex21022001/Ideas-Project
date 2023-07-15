@@ -73,6 +73,16 @@ public class ProjectService {
                 .map(projectReadMapper::map);
     }
 
+    public Optional<byte[]> downloadImage(Integer id) {
+        return projectRepository.findById(id)
+                .flatMap(project -> s3Service.download(project.getImagePath(), Project.class));
+    }
+
+    public Optional<byte[]> downloadDoc(Integer id) {
+        return projectRepository.findById(id)
+                .filter(project -> project.getDocPath() != null)
+                .flatMap(project -> s3Service.download(project.getDocPath(), Project.class));
+    }
 
     @Transactional
     public Optional<ProjectReadDto> create(ProjectCreateDto projectDto, Integer userId) {
@@ -84,8 +94,8 @@ public class ProjectService {
                     uploadFile(projectDto.getImage())
                             .ifPresent(project::setImagePath);
 
-                    uploadFile(projectDto.getDocs())
-                            .ifPresent(project::setDocsPath);
+                    uploadFile(projectDto.getDoc())
+                            .ifPresent(project::setDocPath);
 
 
                     user.addProject(project);
@@ -125,7 +135,7 @@ public class ProjectService {
         projectRepository.findById(id)
                 .ifPresent(project -> uploadFile(file)
                         .ifPresent(docPath -> {
-                            project.setDocsPath(docPath);
+                            project.setDocPath(docPath);
                             projectRepository.saveAndFlush(project);
                             log.debug("Project:{} was updated. Doc was chanced to {}", project, file.getOriginalFilename());
                         }));

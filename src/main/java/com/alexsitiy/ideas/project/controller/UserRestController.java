@@ -42,7 +42,7 @@ public class UserRestController {
 
     @PutMapping("/avatar")
     public ResponseEntity<?> updateAvatar(@RequestParam("avatar")
-                                          @FileCheck(nullable = false, contentType = {"image/png", "image/jpg"})
+                                          @FileCheck(nullable = false, contentType = {"image/png", "image/jpeg"})
                                           MultipartFile image,
                                           @AuthenticationPrincipal SecurityUser user) {
 

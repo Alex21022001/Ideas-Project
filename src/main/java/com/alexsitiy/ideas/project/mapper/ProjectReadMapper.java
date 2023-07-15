@@ -19,7 +19,7 @@ public class ProjectReadMapper implements Mapper<Project, ProjectReadDto> {
                 .title(object.getTitle())
                 .description(object.getDescription())
                 .image(object.getImagePath())
-                .docs(object.getDocsPath())
+                .doc(object.getDocPath())
                 .status(object.getStatus())
                 .likes(object.getReaction().getLikes())
                 .dislikes(object.getReaction().getDislikes())

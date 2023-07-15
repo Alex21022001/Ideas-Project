@@ -47,9 +47,14 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(url -> url
-                        .requestMatchers(antMatcher("/auth/**"),
+                        .requestMatchers(
+                                antMatcher("/auth/**"),
+                                antMatcher(HttpMethod.GET, "/api/v1/projects"),
+                                antMatcher(HttpMethod.GET, "/api/v1/projects/{id}"),
                                 antMatcher(HttpMethod.GET, "/api/v1/users/{id}/avatar"),
-                                antMatcher(HttpMethod.GET, "/api/v1/projects/{id}/avatar")).permitAll()
+                                antMatcher(HttpMethod.GET, "/api/v1/projects/{id}/image"),
+                                antMatcher(HttpMethod.GET, "/api/v1/projects/{id}/doc")
+                        ).permitAll()
                         .requestMatchers(antMatcher("/api/v1/**")).authenticated()
                         .anyRequest().authenticated()
                 )

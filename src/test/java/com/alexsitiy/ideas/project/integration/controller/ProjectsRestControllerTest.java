@@ -124,7 +124,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                 .andExpectAll(
                         jsonPath("id").value(4),
                         jsonPath("image", is(notNullValue())),
-                        jsonPath("docs", is(nullValue()))
+                        jsonPath("doc", is(nullValue()))
                 );
     }
 
@@ -238,7 +238,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
         Optional<Project> actual = projectRepository.findById(projectId);
         assertThat(actual).isPresent()
-                .map(Project::getDocsPath)
+                .map(Project::getDocPath)
                 .get().isEqualTo(newDocPath);
     }
 

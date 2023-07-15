@@ -169,7 +169,7 @@ class ProjectServiceTest {
         Project actual = projectCaptor.getValue();
         assertThat(actual).isNotNull()
                 .hasFieldOrPropertyWithValue("id", projectId)
-                .hasFieldOrPropertyWithValue("docsPath", newDocPath);
+                .hasFieldOrPropertyWithValue("docPath", newDocPath);
     }
 
     @Test
@@ -287,7 +287,7 @@ class ProjectServiceTest {
                 .title("test1")
                 .description("test1-description")
                 .imagePath("test1.png")
-                .docsPath("test1.pdf")
+                .docPath("test1.pdf")
                 .status(Status.WAITING)
                 .build();
     }
