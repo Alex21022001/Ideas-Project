@@ -7,6 +7,7 @@ import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.exception.UploadingFileException;
 import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.ProjectService;
+import com.alexsitiy.ideas.project.validation.ContentType;
 import com.alexsitiy.ideas.project.validation.FileCheck;
 import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
@@ -125,7 +126,8 @@ public class ProjectsRestController {
     @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
     public ResponseEntity<?> updateImage(@PathVariable("id") Integer id,
                                          @RequestParam("image")
-                                         @FileCheck(nullable = false, contentType = {"image/png", "image/jpeg"})
+                                         @FileCheck(nullable = false, contentType = {
+                                                 ContentType.IMAGE_PNG_VALUE, ContentType.IMAGE_JPEG_VALUE})
                                          MultipartFile file) {
 
         projectService.updateImage(id, file);
@@ -136,7 +138,7 @@ public class ProjectsRestController {
     @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
     public ResponseEntity<?> updateDoc(@PathVariable("id") Integer id,
                                        @RequestParam("doc")
-                                       @FileCheck(nullable = false, contentType = {"application/pdf"})
+                                       @FileCheck(nullable = false, contentType = {ContentType.APPLICATION_PDF_VALUE})
                                        MultipartFile file) {
 
         projectService.updateDoc(id, file);

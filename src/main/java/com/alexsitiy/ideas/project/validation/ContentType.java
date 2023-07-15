@@ -1,19 +1,11 @@
 package com.alexsitiy.ideas.project.validation;
 
 public enum ContentType {
-    IMAGE_PNG("image/png");
+    IMAGE_PNG,
+    IMAGE_JPEG,
+    APPLICATION_PDF;
 
-    private final String value;
-
-    ContentType(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public String getFormattedValue() {
-        return "prefix/" + value;  // Add your desired prefix here
-    }
+    public static final String IMAGE_PNG_VALUE = "image/png";
+    public static final String IMAGE_JPEG_VALUE = "image/jpeg";
+    public static final String APPLICATION_PDF_VALUE = "application/pdf";
 }

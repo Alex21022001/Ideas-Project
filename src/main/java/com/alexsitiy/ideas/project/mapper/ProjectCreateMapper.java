@@ -13,7 +13,7 @@ public class ProjectCreateMapper implements Mapper<ProjectCreateDto, Project>{
         return Project.builder()
                 .title(object.getTitle())
                 .description(object.getDescription())
-                .status(Status.WAITING)
+                .status(Status.IN_PROGRESS)
                 .build();
     }
 }

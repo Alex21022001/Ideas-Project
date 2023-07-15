@@ -1,5 +1,6 @@
 package com.alexsitiy.ideas.project.dto;
 
+import com.alexsitiy.ideas.project.validation.ContentType;
 import com.alexsitiy.ideas.project.validation.FileCheck;
 import com.alexsitiy.ideas.project.validation.TitleCheck;
 import jakarta.validation.constraints.NotBlank;
@@ -23,10 +24,10 @@ public class ProjectCreateDto {
     @Size(max = 256)
     private String description;
 
-    @FileCheck(contentType = {"image/png","image/jpeg"},nullable = false)
+    @FileCheck(contentType = {ContentType.IMAGE_PNG_VALUE, ContentType.IMAGE_JPEG_VALUE}, nullable = false)
     private MultipartFile image;
 
-    @FileCheck(contentType = {"application/pdf"})
+    @FileCheck(contentType = {ContentType.APPLICATION_PDF_VALUE})
     private MultipartFile doc;
 
 }

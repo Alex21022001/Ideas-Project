@@ -19,7 +19,7 @@ CREATE TABLE project
     description text                                        NOT NULL,
     image_path  varchar(128)                                NOT NULL,
     docs_path   varchar(128),
-    status      varchar(16)                                 NOT NULL DEFAULT 'WAITING',
+    status      varchar(16)                                 NOT NULL DEFAULT 'IN_PROGRESS',
     user_id     int REFERENCES users (id) ON DELETE CASCADE NOT NULL
 );
 
