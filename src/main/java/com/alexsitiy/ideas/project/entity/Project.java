@@ -5,6 +5,9 @@ import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OptimisticLockType;
 import org.hibernate.annotations.OptimisticLocking;
+import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
+import org.hibernate.envers.RelationTargetAuditMode;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.List;
 @Table
 @ToString(exclude = {"user", "comments"})
 @EqualsAndHashCode(exclude = {"user", "comments"})
+@Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 public class Project {
 
     @Id
@@ -39,13 +43,16 @@ public class Project {
     @Column(name = "docs_path")
     private String docPath;
 
+    @NotAudited
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @NotAudited
     @OneToOne(mappedBy = "project", optional = false, cascade = CascadeType.PERSIST)
     private Reaction reaction;
 
+    @NotAudited
     @Builder.Default
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();

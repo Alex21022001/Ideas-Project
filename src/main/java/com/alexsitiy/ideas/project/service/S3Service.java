@@ -56,7 +56,7 @@ public class S3Service {
         try (ResponseInputStream<GetObjectResponse> result = s3Client.getObject(getObjectRequest)) {
             return Optional.ofNullable(result.readAllBytes());
         } catch (IOException | S3Exception ex) {
-            log.error("Couldn't read a File by Path: {}. Exception: {}", path, ex.getMessage());
+            log.warn("Couldn't read a File by Path: {}. Exception: {}", path, ex.getMessage());
         }
         return Optional.empty();
     }
