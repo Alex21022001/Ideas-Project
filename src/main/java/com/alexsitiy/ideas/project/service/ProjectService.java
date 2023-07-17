@@ -1,11 +1,9 @@
 package com.alexsitiy.ideas.project.service;
 
-import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
-import com.alexsitiy.ideas.project.dto.ProjectFilter;
-import com.alexsitiy.ideas.project.dto.ProjectReadDto;
-import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
+import com.alexsitiy.ideas.project.dto.*;
 import com.alexsitiy.ideas.project.entity.*;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
+import com.alexsitiy.ideas.project.mapper.ProjectHistoryMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectReadMapper;
 import com.alexsitiy.ideas.project.repository.CommentRepository;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
@@ -40,6 +38,7 @@ public class ProjectService {
 
     private final ProjectCreateMapper projectCreateMapper;
     private final ProjectReadMapper projectReadMapper;
+    private final ProjectHistoryMapper projectHistoryMapper;
 
     private final EntityManager entityManager;
 
@@ -58,19 +57,24 @@ public class ProjectService {
                 .map(projectReadMapper::map);
     }
 
-    public Page<ProjectReadDto> findAllByUserId(Integer id, Pageable pageable) {
-        return projectRepository.findAllByUserId(id, pageable)
+    public Page<ProjectReadDto> findAllByUserId(Integer userId, Pageable pageable) {
+        return projectRepository.findAllByUserId(userId, pageable)
                 .map(projectReadMapper::map);
     }
 
-    public Page<ProjectReadDto> findAllLikedByUserId(Integer id, Pageable pageable) {
-        return projectRepository.findAllCommentedByUserIdAndCommentType(id, CommentType.LIKE, pageable)
+    public Page<ProjectReadDto> findAllLikedByUserId(Integer userId, Pageable pageable) {
+        return projectRepository.findAllCommentedByUserIdAndCommentType(userId, CommentType.LIKE, pageable)
                 .map(projectReadMapper::map);
     }
 
-    public Page<ProjectReadDto> findAllDislikedByUserId(Integer id, Pageable pageable) {
-        return projectRepository.findAllCommentedByUserIdAndCommentType(id, CommentType.DISLIKE, pageable)
+    public Page<ProjectReadDto> findAllDislikedByUserId(Integer userId, Pageable pageable) {
+        return projectRepository.findAllCommentedByUserIdAndCommentType(userId, CommentType.DISLIKE, pageable)
                 .map(projectReadMapper::map);
+    }
+
+    public Page<ProjectHistoryDto> findAllProjectHistoryByUser(String username, Pageable pageable) {
+        return projectRepository.findAllProjectHistoryByUsername(username, pageable)
+                .map(projectHistoryMapper::map);
     }
 
     public Optional<byte[]> downloadImage(Integer id) {

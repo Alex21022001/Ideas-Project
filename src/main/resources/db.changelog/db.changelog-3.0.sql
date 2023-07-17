@@ -18,8 +18,7 @@ CREATE TABLE project_aud
     docs_path   varchar(128),
     status      varchar(16),
     rev         int REFERENCES revision (id),
-    revtype     smallint,
-    user_id     int REFERENCES users (id)
+    revtype     smallint
 );
 
 

@@ -1,21 +1,14 @@
 package com.alexsitiy.ideas.project.controller;
 
 import com.alexsitiy.ideas.project.dto.*;
-import com.alexsitiy.ideas.project.dto.error.FileErrorResponse;
-import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
-import com.alexsitiy.ideas.project.exception.UploadingFileException;
 import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.validation.ContentType;
 import com.alexsitiy.ideas.project.validation.FileCheck;
-import jakarta.validation.Valid;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/projects")
@@ -79,6 +67,17 @@ public class ProjectsRestController {
         Page<ProjectReadDto> projects = projectService.findAllDislikedByUserId(user.getId(), sort.getPageable());
 
         return ResponseEntity.ok(PageResponse.of(projects));
+    }
+
+    @GetMapping("/user/history")
+    public ResponseEntity<PageResponse<ProjectHistoryDto>> findAllProjectHistoryByUser(@AuthenticationPrincipal
+                                                                                       SecurityUser user,
+                                                                                       Pageable pageable) {
+
+        Page<ProjectHistoryDto> projectHistory =
+                projectService.findAllProjectHistoryByUser(user.getUsername(), pageable);
+
+        return ResponseEntity.ok(PageResponse.of(projectHistory));
     }
 
     @PostMapping

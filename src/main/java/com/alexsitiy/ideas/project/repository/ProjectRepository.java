@@ -2,6 +2,7 @@ package com.alexsitiy.ideas.project.repository;
 
 import com.alexsitiy.ideas.project.entity.CommentType;
 import com.alexsitiy.ideas.project.entity.Project;
+import com.alexsitiy.ideas.project.repository.custom.ProjectHistoryRepository;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,8 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Integer>,
-        QuerydslPredicateExecutor<Project> {
+        QuerydslPredicateExecutor<Project>,
+        ProjectHistoryRepository {
 
     Optional<Project> findByTitle(String title);
 

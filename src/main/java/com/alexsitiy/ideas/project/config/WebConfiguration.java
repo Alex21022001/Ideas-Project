@@ -1,6 +1,9 @@
 package com.alexsitiy.ideas.project.config;
 
 import com.alexsitiy.ideas.project.dto.SortRequest;
+import jakarta.persistence.EntityManager;
+import org.hibernate.envers.AuditReader;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -42,8 +45,8 @@ public class WebConfiguration implements WebMvcConfigurer {
             String maybeSize = webRequest.getParameter("size");
             String[] mayBeSortList = webRequest.getParameterValues("sort");
 
-            int page = maybePage == null ? DEFAULT_PAGE : Integer.parseInt(maybePage);
-            int size = maybeSize == null ? DEFAULT_SIZE : Integer.parseInt(maybeSize);
+            int page = maybePage == null || maybePage.isBlank() ? DEFAULT_PAGE : Integer.parseInt(maybePage);
+            int size = maybeSize == null || maybeSize.isBlank() ? DEFAULT_SIZE : Integer.parseInt(maybeSize);
             List<String> sortList = mayBeSortList == null ? List.of(DEFAULT_SORT) : Arrays.asList(mayBeSortList);
 
             return new SortRequest(page, size, sortList);
