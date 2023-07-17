@@ -6,6 +6,8 @@ import com.alexsitiy.ideas.project.entity.HistoryEntity;
 import com.alexsitiy.ideas.project.entity.Project;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+
 @Component
 public class ProjectHistoryMapper implements Mapper<HistoryEntity<Project>, ProjectHistoryDto> {
 
@@ -21,7 +23,7 @@ public class ProjectHistoryMapper implements Mapper<HistoryEntity<Project>, Proj
                 .status(project.getStatus())
                 .createdAt(project.getCreatedAt())
                 .actionType(ActionType.getByRevisionType(object.getRevisionType()))
-                .executedAt(object.getDateTime())
+                .executedAt(Instant.ofEpochMilli(object.getRevision().getTimestamp()))
                 .build();
     }
 }

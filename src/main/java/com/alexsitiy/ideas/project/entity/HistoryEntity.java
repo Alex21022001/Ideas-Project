@@ -17,9 +17,4 @@ public class HistoryEntity<T> {
     private T entity;
     private Revision revision;
     private RevisionType revisionType;
-
-    public LocalDate getDateTime() {
-        Instant instant = Instant.ofEpochMilli(revision.getTimestamp());
-        return LocalDate.ofInstant(instant, ZoneId.systemDefault());
-    }
 }

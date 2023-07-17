@@ -13,10 +13,14 @@ public class IdeasProjectApplication {
     public static void main(String[] args) {
         // TODO: 11.07.2023
         //  Add Project created_at in order to see a new Project and add title "NEW" on Front
+        //  Add Sorting by NEW Project
+        //
+        //
         //
         //  Add caching on Project
         //
         SpringApplication.run(IdeasProjectApplication.class, args);
+
     }
 
 }

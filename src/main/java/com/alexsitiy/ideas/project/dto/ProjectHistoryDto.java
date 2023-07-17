@@ -24,6 +24,6 @@ public class ProjectHistoryDto {
     private Status status;
     private Instant createdAt;
     private ActionType actionType;
-    private LocalDate executedAt;
+    private Instant executedAt;
 
 }
