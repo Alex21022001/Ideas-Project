@@ -7,7 +7,7 @@ import com.alexsitiy.ideas.project.entity.Project;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ProjectHistoryMapper implements Mapper<HistoryEntity<Project>, ProjectHistoryDto>{
+public class ProjectHistoryMapper implements Mapper<HistoryEntity<Project>, ProjectHistoryDto> {
 
     @Override
     public ProjectHistoryDto map(HistoryEntity<Project> object) {
@@ -19,6 +19,7 @@ public class ProjectHistoryMapper implements Mapper<HistoryEntity<Project>, Proj
                 .image(project.getImagePath())
                 .doc(project.getDocPath())
                 .status(project.getStatus())
+                .createdAt(project.getCreatedAt())
                 .actionType(ActionType.getByRevisionType(object.getRevisionType()))
                 .executedAt(object.getDateTime())
                 .build();

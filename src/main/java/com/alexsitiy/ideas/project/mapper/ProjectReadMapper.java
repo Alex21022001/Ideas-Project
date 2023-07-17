@@ -24,6 +24,8 @@ public class ProjectReadMapper implements Mapper<Project, ProjectReadDto> {
                 .likes(object.getReaction().getLikes())
                 .dislikes(object.getReaction().getDislikes())
                 .creator(userReadMapper.map(object.getUser()))
+                .createdAt(object.getCreatedAt())
                 .build();
+
     }
 }

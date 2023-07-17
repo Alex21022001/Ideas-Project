@@ -12,14 +12,6 @@ public class IdeasProjectApplication {
 
     public static void main(String[] args) {
         // TODO: 11.07.2023
-        //  Add User's history
-        //  Add Hibernate Envers
-        //  1) Add Revision + Add Project Aud
-        //  Show User's:
-        //  1) Add Project
-        //  2) Update Project
-        //  3) Delete Project
-        //
         //  Add Project created_at in order to see a new Project and add title "NEW" on Front
         //
         //  Add caching on Project

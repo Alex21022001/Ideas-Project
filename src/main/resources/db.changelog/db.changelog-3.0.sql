@@ -17,6 +17,7 @@ CREATE TABLE project_aud
     image_path  varchar(128),
     docs_path   varchar(128),
     status      varchar(16),
+    created_at  timestamp,
     rev         int REFERENCES revision (id),
     revtype     smallint
 );

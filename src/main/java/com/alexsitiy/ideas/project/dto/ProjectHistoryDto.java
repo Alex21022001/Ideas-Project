@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.RevisionType;
 
+import java.time.Instant;
 import java.time.LocalDate;
 
 @AllArgsConstructor
@@ -21,6 +22,8 @@ public class ProjectHistoryDto {
     private String image;
     private String doc;
     private Status status;
+    private Instant createdAt;
     private ActionType actionType;
     private LocalDate executedAt;
+
 }

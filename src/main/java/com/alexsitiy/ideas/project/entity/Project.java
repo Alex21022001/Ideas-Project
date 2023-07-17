@@ -10,6 +10,7 @@ import org.hibernate.envers.NotAudited;
 import org.hibernate.envers.RelationTargetAuditMode;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +44,9 @@ public class Project {
     @Column(name = "docs_path")
     private String docPath;
 
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
     @NotAudited
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -56,4 +60,9 @@ public class Project {
     @Builder.Default
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
+
+    @PrePersist
+    public void prePersist() {
+        this.setCreatedAt(Instant.now());
+    }
 }

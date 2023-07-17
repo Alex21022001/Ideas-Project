@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -20,5 +22,6 @@ public class ProjectReadDto {
     private Status status;
     private Integer likes;
     private Integer dislikes;
+    private Instant createdAt;
     private UserReadDto creator;
 }
