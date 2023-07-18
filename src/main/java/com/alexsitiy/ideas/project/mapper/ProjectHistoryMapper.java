@@ -20,7 +20,6 @@ public class ProjectHistoryMapper implements Mapper<HistoryEntity<Project>, Proj
                 .description(project.getDescription())
                 .image(project.getImagePath())
                 .doc(project.getDocPath())
-                .status(project.getStatus())
                 .createdAt(project.getCreatedAt())
                 .actionType(ActionType.getByRevisionType(object.getRevisionType()))
                 .executedAt(Instant.ofEpochMilli(object.getRevision().getTimestamp()))

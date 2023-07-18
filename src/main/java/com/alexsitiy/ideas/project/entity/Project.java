@@ -1,5 +1,6 @@
 package com.alexsitiy.ideas.project.entity;
 
+import com.alexsitiy.ideas.project.listener.ProjectDefaultValueListener;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -23,6 +24,7 @@ import java.util.List;
 @ToString(exclude = {"user", "comments"})
 @EqualsAndHashCode(exclude = {"user", "comments"})
 @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+@EntityListeners({ProjectDefaultValueListener.class})
 public class Project {
 
     @Id
@@ -35,9 +37,6 @@ public class Project {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
     @Column(name = "image_path", nullable = false)
     private String imagePath;
 
@@ -46,6 +45,10 @@ public class Project {
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
+
+    @NotAudited
+    @OneToOne(mappedBy = "project", fetch = FetchType.EAGER, optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private ProjectStatus status;
 
     @NotAudited
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -60,9 +63,4 @@ public class Project {
     @Builder.Default
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
-
-    @PrePersist
-    public void prePersist() {
-        this.setCreatedAt(Instant.now());
-    }
 }

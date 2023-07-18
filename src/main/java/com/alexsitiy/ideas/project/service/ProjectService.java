@@ -45,7 +45,7 @@ public class ProjectService {
     public Page<ProjectReadDto> findAll(ProjectFilter filter, Pageable pageable) {
         Predicate predicate = QPredicate.builder()
                 .add(filter.title(), project.title::containsIgnoreCase)
-                .add(filter.statuses(), project.status::in)
+                .add(filter.statuses(), project.status.status::in)
                 .buildAll();
 
         return projectRepository.findAll(predicate, pageable)
@@ -93,7 +93,6 @@ public class ProjectService {
         return userRepository.findById(userId)
                 .map(user -> {
                     Project project = projectCreateMapper.map(projectDto);
-                    Reaction reaction = new Reaction();
 
                     uploadFile(projectDto.getImage())
                             .ifPresent(project::setImagePath);
@@ -101,9 +100,7 @@ public class ProjectService {
                     uploadFile(projectDto.getDoc())
                             .ifPresent(project::setDocPath);
 
-
                     user.addProject(project);
-                    reaction.setProject(project);
                     projectRepository.save(project);
                     log.debug("Project {} was created", project);
                     return project;

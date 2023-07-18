@@ -12,9 +12,12 @@ public class IdeasProjectApplication {
 
     public static void main(String[] args) {
         // TODO: 11.07.2023
-        //  Add Project created_at in order to see a new Project and add title "NEW" on Front
-        //  Add Sorting by NEW Project
+        //  Change Project.Status to separate Table (Project.Id,Status)
+        //  Add Listener to set default values in Project during Persist
+        //  Add Optimistic LOCK and inform Expert of exception
+        //  Forbid to change Project after it was estimated
         //
+        //  Add Test on Project create (check Reaction, ProjectStatus creation)
         //
         //
         //  Add caching on Project

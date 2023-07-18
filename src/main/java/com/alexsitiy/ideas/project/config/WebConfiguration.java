@@ -17,10 +17,10 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new SortRequestMethodArgumentResolver());
+        resolvers.add(new ProjectSortMethodArgumentResolver());
     }
 
-    static class SortRequestMethodArgumentResolver implements HandlerMethodArgumentResolver {
+    static class ProjectSortMethodArgumentResolver implements HandlerMethodArgumentResolver {
         private static final Integer DEFAULT_PAGE = 0;
         private static final Integer DEFAULT_SIZE = 20;
         private static final String DEFAULT_SORT = "likes";

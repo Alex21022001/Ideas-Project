@@ -21,7 +21,6 @@ public class ProjectHistoryDto {
     private String description;
     private String image;
     private String doc;
-    private Status status;
     private Instant createdAt;
     private ActionType actionType;
     private Instant executedAt;

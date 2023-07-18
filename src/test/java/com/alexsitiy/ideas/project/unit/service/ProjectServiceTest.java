@@ -309,7 +309,6 @@ class ProjectServiceTest {
                 .description("test1-description")
                 .imagePath("test1.png")
                 .docPath("test1.pdf")
-                .status(Status.IN_PROGRESS)
                 .build();
     }
 
@@ -320,7 +319,6 @@ class ProjectServiceTest {
                 .description("test1-description")
                 .imagePath("test1.png")
                 .docPath(doc)
-                .status(Status.IN_PROGRESS)
                 .build();
     }
 

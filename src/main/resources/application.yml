@@ -17,7 +17,7 @@ spring:
     open-in-view: false
   jackson:
     date-format: java.text.SimpleDateFormat
-    time-zone: Europe/Kiev
+
   #  security:
   #    oauth2:
   #      client:

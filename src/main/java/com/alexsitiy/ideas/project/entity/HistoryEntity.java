@@ -13,7 +13,6 @@ import java.time.ZoneId;
 @AllArgsConstructor
 @Data
 public class HistoryEntity<T> {
-
     private T entity;
     private Revision revision;
     private RevisionType revisionType;

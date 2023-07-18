@@ -47,8 +47,17 @@ class ProjectServiceIT extends IntegrationTestBase {
                 .get()
                 .hasFieldOrPropertyWithValue("id", NEXT_PROJECT_ID)
                 .hasFieldOrPropertyWithValue("image", imagePath)
+                .hasFieldOrPropertyWithValue("status",Status.IN_PROGRESS)
                 .extracting("creator", as(InstanceOfAssertFactories.type(UserReadDto.class)))
                 .isNotNull().hasFieldOrPropertyWithValue("id", USER_1_ID);
+
+        entityManager.clear();
+
+        Optional<Project> projectWithReaction = projectRepository.findById(NEXT_PROJECT_ID);
+        assertThat(projectWithReaction)
+                .isPresent().map(Project::getReaction).get()
+                .hasFieldOrPropertyWithValue("likes",0)
+                .hasFieldOrPropertyWithValue("dislikes",0);
     }
 
     @Test

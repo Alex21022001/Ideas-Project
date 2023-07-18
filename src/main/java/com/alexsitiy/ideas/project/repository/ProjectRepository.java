@@ -20,17 +20,21 @@ public interface ProjectRepository extends JpaRepository<Project, Integer>,
     Optional<Project> findByTitle(String title);
 
     @Override
-    @EntityGraph(attributePaths = {"user", "reaction"})
+    @EntityGraph(attributePaths = {"reaction", "status"})
+    Optional<Project> findById(Integer integer);
+
+    @Override
+    @EntityGraph(attributePaths = {"user", "reaction", "status"})
     Page<Project> findAll(Predicate predicate, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user", "reaction"})
+    @EntityGraph(attributePaths = {"user", "reaction", "status"})
     Page<Project> findAllByUserId(Integer userId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user", "reaction"})
+    @EntityGraph(attributePaths = {"user", "reaction", "status"})
     @Query("SELECT p FROM Project p JOIN Comment c on p.id = c.project.id WHERE c.user.id = :userId AND c.type = :type")
     Page<Project> findAllCommentedByUserIdAndCommentType(Integer userId, CommentType type, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"user", "reaction"})
+    @EntityGraph(attributePaths = {"user", "reaction", "status"})
     @Query("SELECT p FROM Project p WHERE p.id = :id")
     Optional<Project> findByIdWithUserAndReaction(Integer id);
 
