@@ -9,7 +9,8 @@ import lombok.*;
 @ToString(exclude = "project")
 @EqualsAndHashCode(exclude = "project")
 @Entity
-public class Reaction {
+@Table(name = "project_reaction")
+public class ProjectReaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -92,7 +92,7 @@ class ProjectServiceIT extends IntegrationTestBase {
                                      comment.getType().equals(CommentType.LIKE));
         assertThat(project).isPresent()
                 .map(Project::getReaction)
-                .isNotEmpty().get(InstanceOfAssertFactories.type(Reaction.class))
+                .isNotEmpty().get(InstanceOfAssertFactories.type(ProjectReaction.class))
                 .hasFieldOrPropertyWithValue("likes", 1)
                 .hasFieldOrPropertyWithValue("dislikes", 1);
     }

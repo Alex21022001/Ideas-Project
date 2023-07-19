@@ -7,7 +7,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_comment")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

@@ -2,7 +2,6 @@ package com.alexsitiy.ideas.project.mapper;
 
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.entity.Project;
-import com.alexsitiy.ideas.project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

@@ -187,37 +187,37 @@ public class ProjectService {
         }
     }
 
-    private void handleExistingComment(CommentType commentType, Reaction reaction, Comment comment) {
+    private void handleExistingComment(CommentType commentType, ProjectReaction projectReaction, Comment comment) {
         if (comment.getType().equals(commentType)) {
-            reaction.decrement(commentType);
+            projectReaction.decrement(commentType);
 
-            reactionRepository.save(reaction);
+            reactionRepository.save(projectReaction);
             commentRepository.delete(comment);
             commentRepository.flush();
             log.debug("Comment: {} was deleted", comment);
-            log.debug("Reaction: {}, {}s were decremented", reaction, commentType.name().toLowerCase());
+            log.debug("Reaction: {}, {}s were decremented", projectReaction, commentType.name().toLowerCase());
         } else {
             comment.setType(commentType);
-            reaction.change(commentType);
+            projectReaction.change(commentType);
 
-            reactionRepository.save(reaction);
+            reactionRepository.save(projectReaction);
             commentRepository.save(comment);
             commentRepository.flush();
             log.debug("Comment: {} was updated. CommentType was changed to {}", comment, commentType);
-            log.debug("Reaction: {}, {}s were incremented", reaction, commentType.name().toLowerCase());
+            log.debug("Reaction: {}, {}s were incremented", projectReaction, commentType.name().toLowerCase());
         }
     }
 
-    private void handleNotExistingComment(Integer projectId, Integer userId, CommentType commentType, Reaction reaction) {
+    private void handleNotExistingComment(Integer projectId, Integer userId, CommentType commentType, ProjectReaction projectReaction) {
         Comment comment = Comment.of(
                 projectRepository.getReferenceById(projectId),
                 userRepository.getReferenceById(userId),
                 commentType);
-        reaction.increment(commentType);
+        projectReaction.increment(commentType);
 
         commentRepository.save(comment);
-        reactionRepository.saveAndFlush(reaction);
-        log.debug("User with ID: {} {}ED Project: {}. Current Reactions: {}", userId, commentType, projectId, reaction);
+        reactionRepository.saveAndFlush(projectReaction);
+        log.debug("User with ID: {} {}ED Project: {}. Current Reactions: {}", userId, commentType, projectId, projectReaction);
     }
 
 }

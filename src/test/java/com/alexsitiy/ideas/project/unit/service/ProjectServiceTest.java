@@ -57,7 +57,7 @@ class ProjectServiceTest {
     @Captor
     private ArgumentCaptor<Comment> commentCaptor;
     @Captor
-    private ArgumentCaptor<Reaction> reactionCaptor;
+    private ArgumentCaptor<ProjectReaction> reactionCaptor;
 
 
     @Test
@@ -215,10 +215,10 @@ class ProjectServiceTest {
     void likeProjectWithoutComment() {
         int userId = 1;
 
-        Reaction reaction = getReaction(getProject());
+        ProjectReaction projectReaction = getReaction(getProject());
 
         doReturn(true).when(projectRepository).existsById(PROJECT_1_ID);
-        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(PROJECT_1_ID);
+        doReturn(Optional.of(projectReaction)).when(reactionRepository).findByIdWithLock(PROJECT_1_ID);
         doReturn(Optional.empty()).when(commentRepository).findCommentByProjectIdAndUserId(PROJECT_1_ID, userId);
 
         boolean actual = projectService.likeProject(PROJECT_1_ID, userId);
@@ -244,10 +244,10 @@ class ProjectServiceTest {
 
         Project project = getProject();
         Comment comment = getComment(userId, project, CommentType.LIKE);
-        Reaction reaction = getReaction(project);
+        ProjectReaction projectReaction = getReaction(project);
 
         doReturn(true).when(projectRepository).existsById(PROJECT_1_ID);
-        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(PROJECT_1_ID);
+        doReturn(Optional.of(projectReaction)).when(reactionRepository).findByIdWithLock(PROJECT_1_ID);
         doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(PROJECT_1_ID, userId);
 
         boolean actual = projectService.likeProject(PROJECT_1_ID, userId);
@@ -272,10 +272,10 @@ class ProjectServiceTest {
 
         Project project = getProject();
         Comment comment = getComment(userId, project, CommentType.DISLIKE);
-        Reaction reaction = getReaction(project);
+        ProjectReaction projectReaction = getReaction(project);
 
         doReturn(true).when(projectRepository).existsById(PROJECT_1_ID);
-        doReturn(Optional.of(reaction)).when(reactionRepository).findByIdWithLock(PROJECT_1_ID);
+        doReturn(Optional.of(projectReaction)).when(reactionRepository).findByIdWithLock(PROJECT_1_ID);
         doReturn(Optional.of(comment)).when(commentRepository).findCommentByProjectIdAndUserId(PROJECT_1_ID, userId);
 
         boolean actual = projectService.likeProject(PROJECT_1_ID, userId);
@@ -322,8 +322,8 @@ class ProjectServiceTest {
                 .build();
     }
 
-    private Reaction getReaction(Project project) {
-        return new Reaction(1, 1, 1, project);
+    private ProjectReaction getReaction(Project project) {
+        return new ProjectReaction(1, 1, 1, project);
     }
 }
 

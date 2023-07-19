@@ -3,13 +3,9 @@ package com.alexsitiy.ideas.project.entity;
 import com.alexsitiy.ideas.project.listener.ProjectDefaultValueListener;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.OptimisticLockType;
-import org.hibernate.annotations.OptimisticLocking;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.hibernate.envers.RelationTargetAuditMode;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.*;
 import java.util.ArrayList;
@@ -57,7 +53,7 @@ public class Project {
 
     @NotAudited
     @OneToOne(mappedBy = "project", optional = false, cascade = CascadeType.PERSIST)
-    private Reaction reaction;
+    private ProjectReaction reaction;
 
     @NotAudited
     @Builder.Default

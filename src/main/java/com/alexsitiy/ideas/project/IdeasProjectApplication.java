@@ -12,13 +12,14 @@ public class IdeasProjectApplication {
 
     public static void main(String[] args) {
         // TODO: 11.07.2023
-        //  Change Project.Status to separate Table (Project.Id,Status)
-        //  Add Listener to set default values in Project during Persist
+        //  Change Project.Status to separate Table (Project.Id,Status) +
+        //  Add Listener to set default values in Project during Persist +
+        //  Add Project.accept() & Project.reject() for Expert
         //  Add Optimistic LOCK and inform Expert of exception
         //  Forbid to change Project after it was estimated
         //
         //  Add Test on Project create (check Reaction, ProjectStatus creation)
-        //
+        //  User.create() Test, whether Avatar exists or not
         //
         //  Add caching on Project
         //

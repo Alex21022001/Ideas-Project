@@ -5,10 +5,10 @@ VALUES (1, 'test1@gmail.com', '{bcrypt}$2a$10$4MZmbaXMS4An5Ne0Rq2Fs.9JNJZVOtAKO3
         'TestExpert', 'TestExpert', 'EXPERT', 'test2Avatar.png');
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
 
-INSERT INTO project(id, title, description, image_path, docs_path, user_id)
-VALUES (1, 'test1', 'test1-description', 'test1.png', 'test1.pdf', (SELECT u.id FROM users u WHERE id = 1)),
-       (2, 'test2', 'test2-description', 'test2.png', 'test2.pdf', (SELECT u.id FROM users u WHERE id = 1)),
-       (3, 'test3', 'test3-description', 'test3.png', 'test3.pdf', (SELECT u.id FROM users u WHERE id = 2));
+INSERT INTO project(id, title, description, image_path, docs_path, created_at, user_id)
+VALUES (1, 'test1', 'test1-description', 'test1.png', 'test1.pdf', '2023-07-19 08:49:23.075000',(SELECT u.id FROM users u WHERE id = 1)),
+       (2, 'test2', 'test2-description', 'test2.png', 'test2.pdf', '2023-07-18 08:49:23.075000',(SELECT u.id FROM users u WHERE id = 1)),
+       (3, 'test3', 'test3-description', 'test3.png', 'test3.pdf', '2023-07-16 08:49:23.075000',(SELECT u.id FROM users u WHERE id = 2));
 SELECT setval('project_id_seq', (SELECT MAX(id) FROM project));
 
 INSERT INTO project_status(id, status, project_id)
@@ -17,17 +17,17 @@ VALUES (1, 'IN_PROGRESS', 1),
        (3, 'ACCEPTED', 3);
 SELECT setval('project_status_id_seq', (SELECT MAX(id) FROM project_status));
 
-INSERT INTO user_comment(id, user_id, project_id, comment_type, commented_at)
+INSERT INTO comment(id, user_id, project_id, comment_type, commented_at)
 VALUES (1, 1, 1, 'LIKE', '2023-07-09 18:33:06.981997'),
        (2, 1, 2, 'LIKE', '2023-07-09 18:34:06.981997'),
        (3, 1, 3, 'DISLIKE', '2023-07-09 18:35:06.981997'),
        (4, 2, 1, 'LIKE', '2023-07-09 18:35:06.981997'),
        (5, 2, 2, 'DISLIKE', '2023-07-09 18:36:06.981997'),
        (6, 2, 3, 'DISLIKE', '2023-07-09 18:36:06.981997');
-SELECT setval('user_comment_id_seq', (SELECT MAX(id) FROM user_comment));
+SELECT setval('comment_id_seq', (SELECT MAX(id) FROM comment));
 
-INSERT INTO reaction(id, likes, dislikes, project_id)
+INSERT INTO project_reaction(id, likes, dislikes, project_id)
 VALUES (1, 2, 0, 1),
        (2, 1, 1, 2),
        (3, 0, 2, 3);
-SELECT setval('reaction_id_seq', (SELECT MAX(id) FROM reaction))
+SELECT setval('project_reaction_id_seq', (SELECT MAX(id) FROM project_reaction))
