@@ -2,13 +2,11 @@ package com.alexsitiy.ideas.project.service;
 
 import com.alexsitiy.ideas.project.dto.*;
 import com.alexsitiy.ideas.project.entity.*;
+import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectHistoryMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectReadMapper;
-import com.alexsitiy.ideas.project.repository.CommentRepository;
-import com.alexsitiy.ideas.project.repository.ProjectRepository;
-import com.alexsitiy.ideas.project.repository.ReactionRepository;
-import com.alexsitiy.ideas.project.repository.UserRepository;
+import com.alexsitiy.ideas.project.repository.*;
 import com.alexsitiy.ideas.project.util.QPredicate;
 import com.querydsl.core.types.Predicate;
 import jakarta.persistence.EntityManager;
@@ -35,6 +33,7 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final ReactionRepository reactionRepository;
+    private final ProjectStatusRepository projectStatusRepository;
 
     private final ProjectCreateMapper projectCreateMapper;
     private final ProjectReadMapper projectReadMapper;
@@ -53,7 +52,7 @@ public class ProjectService {
     }
 
     public Optional<ProjectReadDto> findById(Integer id) {
-        return projectRepository.findByIdWithUserAndReaction(id)
+        return projectRepository.findByIdWithUserAndReactionAndStatus(id)
                 .map(projectReadMapper::map);
     }
 
@@ -110,7 +109,7 @@ public class ProjectService {
 
     @Transactional
     public Optional<ProjectReadDto> update(Integer id, ProjectUpdateDto projectDto) {
-        return projectRepository.findByIdWithUserAndReaction(id)
+        return projectRepository.findByIdWithUserAndReactionAndStatus(id)
                 .map(project -> {
                     project.setDescription(projectDto.getDescription());
                     project.setTitle(projectDto.getTitle());
@@ -164,8 +163,33 @@ public class ProjectService {
         return comment(id, userId, CommentType.DISLIKE);
     }
 
+    @Transactional
+    public void acceptProject(Integer projectId) {
+        changeProjectStatus(projectId, Status.ACCEPTED);
+    }
+
+    @Transactional
+    public void rejectProject(Integer projectId) {
+        changeProjectStatus(projectId, Status.REJECTED);
+    }
+
+    private void changeProjectStatus(Integer projectId, Status status) {
+        // TODO: 22.07.2023 don't need to check project existence
+        // Process OptimisticLockException
+        if (!projectRepository.existsById(projectId)) {
+            throw new NoSuchProjectException("There is no such Project with id:" + projectId);
+        } else {
+            projectStatusRepository.findByProjectId(projectId)
+                    .ifPresent(projectStatus -> {
+                        projectStatus.setStatus(status);
+                        projectStatusRepository.saveAndFlush(projectStatus);
+                    });
+        }
+    }
+
 
     private boolean comment(Integer projectId, Integer userId, CommentType commentType) {
+        // TODO: 22.07.2023 don't need to check project existence
         if (!projectRepository.existsById(projectId)) {
             return false;
         }
@@ -177,14 +201,6 @@ public class ProjectService {
                                 () -> handleNotExistingComment(projectId, userId, commentType, reaction)));
 
         return true;
-    }
-
-    private Optional<String> uploadFile(MultipartFile file) {
-        if (file == null || file.isEmpty())
-            return Optional.empty();
-        else {
-            return s3Service.upload(file, Project.class);
-        }
     }
 
     private void handleExistingComment(CommentType commentType, ProjectReaction projectReaction, Comment comment) {
@@ -220,6 +236,13 @@ public class ProjectService {
         log.debug("User with ID: {} {}ED Project: {}. Current Reactions: {}", userId, commentType, projectId, projectReaction);
     }
 
+    private Optional<String> uploadFile(MultipartFile file) {
+        if (file == null || file.isEmpty())
+            return Optional.empty();
+        else {
+            return s3Service.upload(file, Project.class);
+        }
+    }
 }
 
 

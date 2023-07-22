@@ -2,6 +2,8 @@ package com.alexsitiy.ideas.project.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OptimisticLockType;
+import org.hibernate.annotations.OptimisticLocking;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -11,6 +13,7 @@ import lombok.*;
 @Builder
 @Entity
 @Table(name = "project_status")
+@OptimisticLocking(type = OptimisticLockType.VERSION)
 public class ProjectStatus {
 
     @Id
@@ -21,7 +24,10 @@ public class ProjectStatus {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false,fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", unique = true, nullable = false)
     private Project project;
+
+    @Version
+    private Integer version;
 }

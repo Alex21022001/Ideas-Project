@@ -36,6 +36,6 @@ public interface ProjectRepository extends JpaRepository<Project, Integer>,
 
     @EntityGraph(attributePaths = {"user", "reaction", "status"})
     @Query("SELECT p FROM Project p WHERE p.id = :id")
-    Optional<Project> findByIdWithUserAndReaction(Integer id);
+    Optional<Project> findByIdWithUserAndReactionAndStatus(Integer id);
 
 }

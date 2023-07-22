@@ -14,9 +14,15 @@ public class IdeasProjectApplication {
         // TODO: 11.07.2023
         //  Change Project.Status to separate Table (Project.Id,Status) +
         //  Add Listener to set default values in Project during Persist +
-        //  Add Project.accept() & Project.reject() for Expert
+        //  Add Project.accept() & Project.reject() for Expert +
         //  Add Optimistic LOCK and inform Expert of exception
         //  Forbid to change Project after it was estimated
+        //  Forbid Expert accept / reject their own Projects
+        //  Add Project.accept() / Project.reject() Tests (Unit + IT)
+        //  Add User notification when Project is estimated
+        //
+        //
+        //  Change boolean to void in Project.comment() + Replace Project.existById() with Reaction.findById Check
         //
         //  Add Test on Project create (check Reaction, ProjectStatus creation)
         //  User.create() Test, whether Avatar exists or not

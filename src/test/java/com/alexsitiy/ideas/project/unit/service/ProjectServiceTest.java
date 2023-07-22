@@ -129,7 +129,7 @@ class ProjectServiceTest {
         ProjectUpdateDto updateDto = new ProjectUpdateDto(title, description);
         Project project = getProject();
 
-        doReturn(Optional.of(project)).when(projectRepository).findByIdWithUserAndReaction(PROJECT_1_ID);
+        doReturn(Optional.of(project)).when(projectRepository).findByIdWithUserAndReactionAndStatus(PROJECT_1_ID);
         doReturn(Project.builder()
                 .id(PROJECT_1_ID)
                 .title(title)

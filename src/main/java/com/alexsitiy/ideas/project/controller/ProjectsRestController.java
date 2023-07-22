@@ -168,6 +168,20 @@ public class ProjectsRestController {
                 ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
+    @PostMapping("/{id}/accept")
+    public ResponseEntity<?> acceptProject(@PathVariable Integer id) {
+        projectService.acceptProject(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<?> rejectProject(@PathVariable Integer id) {
+        projectService.rejectProject(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @ExceptionHandler(NoSuchProjectException.class)
     public ResponseEntity<?> handleNoSuchProjectException() {
         return ResponseEntity.notFound().build();

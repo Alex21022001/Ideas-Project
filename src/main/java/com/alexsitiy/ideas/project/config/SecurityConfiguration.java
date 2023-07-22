@@ -1,6 +1,7 @@
 package com.alexsitiy.ideas.project.config;
 
 import com.alexsitiy.ideas.project.config.filter.JwtAuthenticationFilter;
+import com.alexsitiy.ideas.project.entity.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -49,12 +50,14 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(url -> url
                         .requestMatchers(
                                 antMatcher("/auth/**"),
+                                antMatcher(HttpMethod.GET, "/api/v1/users/{id}/avatar"),
                                 antMatcher(HttpMethod.GET, "/api/v1/projects"),
                                 antMatcher(HttpMethod.GET, "/api/v1/projects/{id}"),
-                                antMatcher(HttpMethod.GET, "/api/v1/users/{id}/avatar"),
                                 antMatcher(HttpMethod.GET, "/api/v1/projects/{id}/image"),
-                                antMatcher(HttpMethod.GET, "/api/v1/projects/{id}/doc")
-                        ).permitAll()
+                                antMatcher(HttpMethod.GET, "/api/v1/projects/{id}/doc")).permitAll()
+                        .requestMatchers(
+                                antMatcher("/api/v1/projects/{id}/accept"),
+                                antMatcher("/api/v1/projects/{id}/reject")).hasAuthority(Role.EXPERT.getAuthority())
                         .requestMatchers(antMatcher("/api/v1/**")).authenticated()
                         .anyRequest().authenticated()
                 )

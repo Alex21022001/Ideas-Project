@@ -38,7 +38,8 @@ CREATE TABLE project_status
 (
     id         serial PRIMARY KEY,
     status     varchar(16)                                   NOT NULL,
-    project_id int REFERENCES project (id) ON DELETE CASCADE NOT NULL UNIQUE
+    project_id int REFERENCES project (id) ON DELETE CASCADE NOT NULL UNIQUE,
+    version    int
 );
 
 --changeset alexsitiy:5
