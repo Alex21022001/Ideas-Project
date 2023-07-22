@@ -78,9 +78,7 @@ class ProjectServiceIT extends IntegrationTestBase {
     void likeProject() {
         int projectId = 3;
         int userId = 1;
-        boolean actual = projectService.likeProject(projectId, userId);
-
-        assertThat(actual).isTrue();
+        projectService.likeProject(projectId, userId);
 
         entityManager.clear();
 
@@ -96,6 +94,9 @@ class ProjectServiceIT extends IntegrationTestBase {
                 .hasFieldOrPropertyWithValue("likes", 1)
                 .hasFieldOrPropertyWithValue("dislikes", 1);
     }
+
+    // TODO: 22.07.2023 updateImageTest & updateDocTest + check that the Project was updated
+    //  Add accept & reject Tests + check ProjectStatus was changed
 
     @NotNull
     private ProjectCreateDto getCreateDto() {

@@ -155,17 +155,15 @@ public class ProjectsRestController {
     @PostMapping("/{id}/like")
     public ResponseEntity<?> likeProject(@PathVariable Integer id,
                                          @AuthenticationPrincipal SecurityUser user) {
-
-        return projectService.likeProject(id, user.getId()) ?
-                ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        projectService.likeProject(id, user.getId());
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/dislike")
     public ResponseEntity<?> dislikeProject(@PathVariable Integer id,
                                             @AuthenticationPrincipal SecurityUser user) {
-
-        return projectService.dislikeProject(id, user.getId()) ?
-                ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        projectService.dislikeProject(id, user.getId());
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/accept")

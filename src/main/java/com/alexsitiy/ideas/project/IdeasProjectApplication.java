@@ -21,6 +21,7 @@ public class IdeasProjectApplication {
         //  Add Project.accept() / Project.reject() Tests (Unit + IT)
         //  Add User notification when Project is estimated
         //
+        //  Add ProjectServiceIT (image + Check that it was changed + doc)
         //
         //  Change boolean to void in Project.comment() + Replace Project.existById() with Reaction.findById Check
         //

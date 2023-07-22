@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -154,13 +155,13 @@ public class ProjectService {
     }
 
     @Transactional
-    public boolean likeProject(Integer id, Integer userId) {
-        return comment(id, userId, CommentType.LIKE);
+    public void likeProject(Integer id, Integer userId) {
+        comment(id, userId, CommentType.LIKE);
     }
 
     @Transactional
-    public boolean dislikeProject(Integer id, Integer userId) {
-        return comment(id, userId, CommentType.DISLIKE);
+    public void dislikeProject(Integer id, Integer userId) {
+        comment(id, userId, CommentType.DISLIKE);
     }
 
     @Transactional
@@ -176,31 +177,34 @@ public class ProjectService {
     private void changeProjectStatus(Integer projectId, Status status) {
         // TODO: 22.07.2023 don't need to check project existence
         // Process OptimisticLockException
-        if (!projectRepository.existsById(projectId)) {
-            throw new NoSuchProjectException("There is no such Project with id:" + projectId);
-        } else {
-            projectStatusRepository.findByProjectId(projectId)
-                    .ifPresent(projectStatus -> {
-                        projectStatus.setStatus(status);
-                        projectStatusRepository.saveAndFlush(projectStatus);
-                    });
-        }
+        projectStatusRepository.findByProjectId(projectId)
+                .ifPresentOrElse(projectStatus -> {
+                            if (projectStatus.getStatus() == Status.IN_PROGRESS) {
+                                projectStatus.setStatus(status);
+                                projectStatusRepository.saveAndFlush(projectStatus);
+                                log.debug("ProjectStatus: {} was updated", projectStatus);
+                            } else {
+                                throw new AccessDeniedException("Can't change Project.status because of it has already been changed by someone");
+                            }
+                        },
+                        () -> {
+                            throw new NoSuchProjectException("There is no such Project with id:" + projectId);
+                        });
     }
 
 
-    private boolean comment(Integer projectId, Integer userId, CommentType commentType) {
-        // TODO: 22.07.2023 don't need to check project existence
-        if (!projectRepository.existsById(projectId)) {
-            return false;
-        }
-
+    private void comment(Integer projectId, Integer userId, CommentType commentType) {
         reactionRepository.findByIdWithLock(projectId)
-                .ifPresent(reaction -> commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
-                        .ifPresentOrElse(comment ->
-                                        handleExistingComment(commentType, reaction, comment),
-                                () -> handleNotExistingComment(projectId, userId, commentType, reaction)));
+                .ifPresentOrElse(reaction -> commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
+                                .ifPresentOrElse(comment ->
+                                                handleExistingComment(commentType, reaction, comment),
+                                        () -> {
+                                            handleNotExistingComment(projectId, userId, commentType, reaction);
+                                        }),
+                        () -> {
+                            throw new NoSuchProjectException("There is no such Project with id:" + projectId);
+                        });
 
-        return true;
     }
 
     private void handleExistingComment(CommentType commentType, ProjectReaction projectReaction, Comment comment) {
