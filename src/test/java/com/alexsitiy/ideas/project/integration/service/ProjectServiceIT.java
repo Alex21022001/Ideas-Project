@@ -47,7 +47,7 @@ class ProjectServiceIT extends IntegrationTestBase {
                 .get()
                 .hasFieldOrPropertyWithValue("id", NEXT_PROJECT_ID)
                 .hasFieldOrPropertyWithValue("image", imagePath)
-                .hasFieldOrPropertyWithValue("status",Status.IN_PROGRESS)
+                .hasFieldOrPropertyWithValue("status", Status.IN_PROGRESS)
                 .extracting("creator", as(InstanceOfAssertFactories.type(UserReadDto.class)))
                 .isNotNull().hasFieldOrPropertyWithValue("id", USER_1_ID);
 
@@ -56,8 +56,8 @@ class ProjectServiceIT extends IntegrationTestBase {
         Optional<Project> projectWithReaction = projectRepository.findById(NEXT_PROJECT_ID);
         assertThat(projectWithReaction)
                 .isPresent().map(Project::getReaction).get()
-                .hasFieldOrPropertyWithValue("likes",0)
-                .hasFieldOrPropertyWithValue("dislikes",0);
+                .hasFieldOrPropertyWithValue("likes", 0)
+                .hasFieldOrPropertyWithValue("dislikes", 0);
     }
 
     @Test
@@ -95,8 +95,81 @@ class ProjectServiceIT extends IntegrationTestBase {
                 .hasFieldOrPropertyWithValue("dislikes", 1);
     }
 
+    @Test
+    void updateImage() {
+        MockMultipartFile imageFile = getImageFile();
+        String newImagePath = "newImagePath";
+
+        doReturn(Optional.of(newImagePath)).when(s3Service).upload(imageFile, Project.class);
+
+        projectService.updateImage(PROJECT_ID, imageFile);
+        entityManager.clear();
+
+        Optional<Project> project = projectRepository.findById(PROJECT_ID);
+        assertThat(project).isPresent()
+                .get()
+                .hasFieldOrPropertyWithValue("imagePath", newImagePath);
+
+    }
+
+    @Test
+    void updateDoc() {
+        MockMultipartFile docFile = getDocFile();
+        String newDocPath = "newDocPath";
+
+        doReturn(Optional.of(newDocPath)).when(s3Service).upload(docFile, Project.class);
+
+        projectService.updateDoc(PROJECT_ID, docFile);
+        entityManager.clear();
+
+        Optional<Project> project = projectRepository.findById(PROJECT_ID);
+        assertThat(project).isPresent()
+                .get()
+                .hasFieldOrPropertyWithValue("docPath", newDocPath);
+
+    }
+
+    @Test
+    void acceptProject() {
+        projectService.acceptProject(PROJECT_ID);
+
+        Optional<Project> project = projectRepository.findById(PROJECT_ID);
+        entityManager.clear();
+
+        assertThat(project).isPresent()
+                .map(Project::getStatus)
+                .get()
+                .hasFieldOrPropertyWithValue("status", Status.ACCEPTED)
+                .hasFieldOrPropertyWithValue("version", 1);
+    }
+
+    @Test
+    void rejectProject() {
+        projectService.rejectProject(PROJECT_ID);
+
+        Optional<Project> project = projectRepository.findById(PROJECT_ID);
+        entityManager.clear();
+
+        assertThat(project).isPresent()
+                .map(Project::getStatus)
+                .get()
+                .hasFieldOrPropertyWithValue("status", Status.REJECTED)
+                .hasFieldOrPropertyWithValue("version", 1);
+    }
+
     // TODO: 22.07.2023 updateImageTest & updateDocTest + check that the Project was updated
     //  Add accept & reject Tests + check ProjectStatus was changed
+
+    @NotNull
+    private MockMultipartFile getDocFile() {
+        return new MockMultipartFile("doc", "new-doc-file.pdf", "application/pdf", new byte[123]);
+    }
+
+    @NotNull
+    private MockMultipartFile getImageFile() {
+        return new MockMultipartFile("image",
+                "some-image.png", "image/png", new byte[123]);
+    }
 
     @NotNull
     private ProjectCreateDto getCreateDto() {

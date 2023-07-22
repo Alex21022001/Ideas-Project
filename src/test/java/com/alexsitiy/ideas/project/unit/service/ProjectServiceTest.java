@@ -7,10 +7,7 @@ import com.alexsitiy.ideas.project.entity.*;
 import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectReadMapper;
-import com.alexsitiy.ideas.project.repository.CommentRepository;
-import com.alexsitiy.ideas.project.repository.ProjectRepository;
-import com.alexsitiy.ideas.project.repository.ReactionRepository;
-import com.alexsitiy.ideas.project.repository.UserRepository;
+import com.alexsitiy.ideas.project.repository.*;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.service.S3Service;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.Optional;
 
@@ -49,6 +47,8 @@ class ProjectServiceTest {
     private CommentRepository commentRepository;
     @Mock
     private ReactionRepository reactionRepository;
+    @Mock
+    private ProjectStatusRepository projectStatusRepository;
 
 
     @Mock
@@ -62,6 +62,8 @@ class ProjectServiceTest {
     private ArgumentCaptor<Comment> commentCaptor;
     @Captor
     private ArgumentCaptor<ProjectReaction> reactionCaptor;
+    @Captor
+    private ArgumentCaptor<ProjectStatus> projectStatusCaptor;
 
 
     @Test
@@ -156,7 +158,6 @@ class ProjectServiceTest {
 
     @Test
     void updateImage() {
-
         MockMultipartFile image = new MockMultipartFile(
                 "image",
                 "new-image.png",
@@ -263,8 +264,6 @@ class ProjectServiceTest {
 
     @Test
     void likeProjectWithDislike() {
-
-
         Project project = getProject();
         Comment comment = getComment(USER_1_ID, project, CommentType.DISLIKE);
         ProjectReaction projectReaction = getReaction(project);
@@ -285,6 +284,70 @@ class ProjectServiceTest {
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("likes", REACTION_LIKES + 1)
                 .hasFieldOrPropertyWithValue("dislikes", REACTION_DISLIKES - 1);
+    }
+
+    @Test
+    void likeNotExistedProject() {
+        int projectId = -1;
+
+        doReturn(Optional.empty()).when(reactionRepository).findByIdWithLock(projectId);
+
+        Assertions.assertThrows(NoSuchProjectException.class, () -> projectService.likeProject(projectId, USER_1_ID));
+    }
+
+    @Test
+    void acceptNewProject() {
+        doReturn(Optional.of(getProjectStatus())).when(projectStatusRepository).findByProjectId(PROJECT_1_ID);
+
+        projectService.acceptProject(PROJECT_1_ID);
+
+        verify(projectStatusRepository, times(1)).saveAndFlush(projectStatusCaptor.capture());
+        assertThat(projectStatusCaptor.getValue()).isNotNull()
+                .hasFieldOrPropertyWithValue("status", Status.ACCEPTED);
+    }
+
+    @Test
+    void rejectNewProject() {
+        doReturn(Optional.of(getProjectStatus())).when(projectStatusRepository).findByProjectId(PROJECT_1_ID);
+
+        projectService.rejectProject(PROJECT_1_ID);
+
+        verify(projectStatusRepository, times(1)).saveAndFlush(projectStatusCaptor.capture());
+        assertThat(projectStatusCaptor.getValue()).isNotNull()
+                .hasFieldOrPropertyWithValue("status", Status.REJECTED);
+    }
+
+    @Test
+    void acceptNotExistedProject() {
+        doReturn(Optional.empty()).when(projectStatusRepository).findByProjectId(PROJECT_1_ID);
+
+        Assertions.assertThrows(NoSuchProjectException.class, () -> projectService.acceptProject(PROJECT_1_ID));
+    }
+
+    @Test
+    void acceptAlreadyEstimatedProject() {
+        doReturn(Optional.of(getEstimatedProjectStatus())).when(projectStatusRepository).findByProjectId(PROJECT_1_ID);
+
+        Assertions.assertThrows(AccessDeniedException.class, () -> projectService.acceptProject(PROJECT_1_ID));
+    }
+
+
+    private ProjectStatus getProjectStatus() {
+        return ProjectStatus.builder()
+                .id(1)
+                .project(getProject())
+                .status(Status.IN_PROGRESS)
+                .version(0)
+                .build();
+    }
+
+    private ProjectStatus getEstimatedProjectStatus() {
+        return ProjectStatus.builder()
+                .id(1)
+                .project(getProject())
+                .status(Status.ACCEPTED)
+                .version(1)
+                .build();
     }
 
     @NotNull

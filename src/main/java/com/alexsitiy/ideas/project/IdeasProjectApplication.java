@@ -16,12 +16,11 @@ public class IdeasProjectApplication {
         //  Add Listener to set default values in Project during Persist +
         //  Add Project.accept() & Project.reject() for Expert +
         //  Add Optimistic LOCK and inform Expert of exception
-        //  Forbid to change Project after it was estimated
-        //  Forbid Expert accept / reject their own Projects
-        //  Add Project.accept() / Project.reject() Tests (Unit + IT)
+        //  Forbid to change Project after it was estimated +
+        //  Add Project.accept() / Project.reject() Tests (Unit + IT) +
         //  Add User notification when Project is estimated
         //
-        //  Add ProjectServiceIT (image + Check that it was changed + doc)
+        //  Forbid Expert accept / reject their own Projects
         //
         //  Change boolean to void in Project.comment() + Replace Project.existById() with Reaction.findById Check
         //

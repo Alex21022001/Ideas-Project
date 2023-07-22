@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
@@ -33,7 +34,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     private static final Integer PROJECT_1_ID = 1;
-    
+    private static final Integer PROJECT_2_ID = 2;
+
     private final MockMvc mockMvc;
     private final S3Service s3Service;
     private final ProjectRepository projectRepository;
@@ -62,7 +64,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                         .queryParam("sort", "dislikes"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpectAll(
-                        jsonPath("data",hasSize(1)),
+                        jsonPath("data", hasSize(1)),
                         jsonPath("metadata.currentPage").value(0),
                         jsonPath("metadata.totalPages").value(2),
                         jsonPath("metadata.totalElements").value(2)
@@ -77,7 +79,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                         .queryParam("sort", "dislikes"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpectAll(
-                        jsonPath("data",hasSize(2)),
+                        jsonPath("data", hasSize(2)),
                         jsonPath("metadata.currentPage").value(0),
                         jsonPath("metadata.totalPages").value(1),
                         jsonPath("metadata.totalElements").value(2)
@@ -92,20 +94,20 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                         .queryParam("sort", "dislikes"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpectAll(
-                        jsonPath("data",hasSize(1)),
+                        jsonPath("data", hasSize(1)),
                         jsonPath("metadata.currentPage").value(0),
                         jsonPath("metadata.totalPages").value(1),
                         jsonPath("metadata.totalElements").value(1)
                 );
     }
-    
+
     @Test
     void getImage() throws Exception {
 
-        doReturn(Optional.of(new byte[1230])).when(s3Service).download(any(),eq(Project.class));
+        doReturn(Optional.of(new byte[1230])).when(s3Service).download(any(), eq(Project.class));
 
-        mockMvc.perform(get("/api/v1/projects/{id}/image",PROJECT_1_ID)
-                .accept(MediaType.APPLICATION_OCTET_STREAM))
+        mockMvc.perform(get("/api/v1/projects/{id}/image", PROJECT_1_ID)
+                        .accept(MediaType.APPLICATION_OCTET_STREAM))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM));
 
@@ -113,7 +115,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     @Test
     void getImageByInvalidProjectId() throws Exception {
-        mockMvc.perform(get("/api/v1/projects/{id}/image",-1)
+        mockMvc.perform(get("/api/v1/projects/{id}/image", -1)
                         .accept(MediaType.APPLICATION_OCTET_STREAM))
                 .andExpect(status().isNotFound());
     }
@@ -121,9 +123,9 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
     @Test
     void getDoc() throws Exception {
 
-        doReturn(Optional.of(new byte[1230])).when(s3Service).download(any(),eq(Project.class));
+        doReturn(Optional.of(new byte[1230])).when(s3Service).download(any(), eq(Project.class));
 
-        mockMvc.perform(get("/api/v1/projects/{id}/doc",PROJECT_1_ID)
+        mockMvc.perform(get("/api/v1/projects/{id}/doc", PROJECT_1_ID)
                         .accept(MediaType.APPLICATION_OCTET_STREAM))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM));
@@ -131,7 +133,7 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
 
     @Test
     void getDocByInvalidProjectId() throws Exception {
-        mockMvc.perform(get("/api/v1/projects/{id}/doc",-1)
+        mockMvc.perform(get("/api/v1/projects/{id}/doc", -1)
                         .accept(MediaType.APPLICATION_OCTET_STREAM))
                 .andExpect(status().isNotFound());
     }
@@ -312,6 +314,35 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @WithUserDetails(value = "test2@gmail.com")
+    void acceptProject() throws Exception {
+        mockMvc.perform(post("/api/v1/projects/{id}/accept", PROJECT_1_ID))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @WithUserDetails(value = "test2@gmail.com")
+    void rejectProject() throws Exception {
+        mockMvc.perform(post("/api/v1/projects/{id}/reject", PROJECT_1_ID))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @WithUserDetails(value = "test2@gmail.com")
+    void acceptAlreadyEstimatedProject() throws Exception {
+        mockMvc.perform(post("/api/v1/projects/{id}/accept", PROJECT_2_ID))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithUserDetails(value = "test2@gmail.com")
+    void acceptNotExistedProject() throws Exception {
+        mockMvc.perform(post("/api/v1/projects/{id}/accept", -1))
+                .andExpect(status().isNotFound());
+    }
+
+
     @NotNull
     private MockMultipartFile getDocFile() {
         return new MockMultipartFile("doc", "new-doc-file.pdf", "application/pdf", new byte[123]);
@@ -401,6 +432,20 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
             int projectId = 3;
 
             mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/projects/{id}", projectId))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithUserDetails("test1@gmail.com")
+        void acceptProjectWithInvalidUser() throws Exception {
+            mockMvc.perform(post("/api/v1/projects/{id}/accept",PROJECT_1_ID))
+                    .andExpect(status().isForbidden());
+        }
+
+        @Test
+        @WithUserDetails("test1@gmail.com")
+        void rejectProjectWithInvalidUser() throws Exception {
+            mockMvc.perform(post("/api/v1/projects/{id}/reject",PROJECT_1_ID))
                     .andExpect(status().isForbidden());
         }
     }
