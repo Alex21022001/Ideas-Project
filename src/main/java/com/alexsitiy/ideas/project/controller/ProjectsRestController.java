@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -183,6 +184,12 @@ public class ProjectsRestController {
     @ExceptionHandler(NoSuchProjectException.class)
     public ResponseEntity<?> handleNoSuchProjectException() {
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<?> handleObjectOptimisticLockingFailureException() {
+        String errorMessage = "The Project's status has been modified by someone else. Please refresh and try again.";
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessage);
     }
 
 }

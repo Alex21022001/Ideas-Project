@@ -17,16 +17,6 @@ spring:
     open-in-view: false
   jackson:
     date-format: java.text.SimpleDateFormat
-
-  #  security:
-  #    oauth2:
-  #      client:
-  #        registration:
-  #          google:
-  #            client-id:
-  #            client-secret:
-  #            redirect-uri: http://localhost:8080/login/oauth2/code/google
-  #            scope: openid,email,profile
   liquibase:
     change-log: db.changelog/db.changelog-master.yaml
   servlet:

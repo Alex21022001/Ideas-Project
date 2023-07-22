@@ -157,9 +157,6 @@ class ProjectServiceIT extends IntegrationTestBase {
                 .hasFieldOrPropertyWithValue("version", 1);
     }
 
-    // TODO: 22.07.2023 updateImageTest & updateDocTest + check that the Project was updated
-    //  Add accept & reject Tests + check ProjectStatus was changed
-
     @NotNull
     private MockMultipartFile getDocFile() {
         return new MockMultipartFile("doc", "new-doc-file.pdf", "application/pdf", new byte[123]);

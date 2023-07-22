@@ -175,8 +175,6 @@ public class ProjectService {
     }
 
     private void changeProjectStatus(Integer projectId, Status status) {
-        // TODO: 22.07.2023 don't need to check project existence
-        // Process OptimisticLockException
         projectStatusRepository.findByProjectId(projectId)
                 .ifPresentOrElse(projectStatus -> {
                             if (projectStatus.getStatus() == Status.IN_PROGRESS) {

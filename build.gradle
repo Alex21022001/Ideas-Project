@@ -16,9 +16,6 @@ java {
 }
 
 configurations {
-//    compileOnly {
-//        extendsFrom annotationProcessor
-//    }
     querydsl.extendsFrom annotationProcessor,implementation,compileOnly,runtimeOnly
 }
 
