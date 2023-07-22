@@ -1,12 +1,15 @@
 package com.alexsitiy.ideas.project.controller;
 
 import com.alexsitiy.ideas.project.dto.*;
+import com.alexsitiy.ideas.project.event.ProjectEstimateEvent;
 import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.security.SecurityUser;
+import com.alexsitiy.ideas.project.service.EmailService;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.validation.ContentType;
 import com.alexsitiy.ideas.project.validation.FileCheck;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProjectsRestController {
 
     private final ProjectService projectService;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjectReadDto> findById(@PathVariable Integer id) {
@@ -171,6 +176,7 @@ public class ProjectsRestController {
     public ResponseEntity<?> acceptProject(@PathVariable Integer id) {
         projectService.acceptProject(id);
 
+        eventPublisher.publishEvent(new ProjectEstimateEvent(id));
         return ResponseEntity.noContent().build();
     }
 
@@ -178,6 +184,7 @@ public class ProjectsRestController {
     public ResponseEntity<?> rejectProject(@PathVariable Integer id) {
         projectService.rejectProject(id);
 
+        eventPublisher.publishEvent(new ProjectEstimateEvent(id));
         return ResponseEntity.noContent().build();
     }
 

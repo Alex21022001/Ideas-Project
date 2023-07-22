@@ -9,10 +9,13 @@ import com.alexsitiy.ideas.project.validation.FileCheck;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.Instant;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -21,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserRestController {
 
     private final UserService userService;
+
 
     @GetMapping("/current")
     public ResponseEntity<UserFullReadDto> getAuthUser(@AuthenticationPrincipal SecurityUser user) {

@@ -1,6 +1,8 @@
 app:
   user:
     default-avatars: defaultAvatar_1.png, defaultAvatar_2.png, defaultAvatar_3.png
+  email:
+    subject: "[IdeaProjects Team]"
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/postgres
@@ -22,18 +24,17 @@ spring:
   servlet:
     multipart:
       max-file-size: 2MB
-#  mail:
-#    host: smtp.gmail.com
-#    port: 587
-#    username: alexeysitiy@gmail.com
-#    password: arqkmemdnnyabqge
-#    properties:
-#      mail:
-#        smtp:
-#          auth: true
-#          starttls:
-#            enable: true
-#            required: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: alexeysitiy@gmail.com
+    password: arqkmemdnnyabqge
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 jwt:
   subject: "Username"
   issuer: "Ideas project"

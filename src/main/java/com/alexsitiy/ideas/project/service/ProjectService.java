@@ -2,6 +2,7 @@ package com.alexsitiy.ideas.project.service;
 
 import com.alexsitiy.ideas.project.dto.*;
 import com.alexsitiy.ideas.project.entity.*;
+import com.alexsitiy.ideas.project.event.ProjectEstimateEvent;
 import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectHistoryMapper;
@@ -12,6 +13,7 @@ import com.querydsl.core.types.Predicate;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -28,6 +30,8 @@ import static com.alexsitiy.ideas.project.entity.QProject.project;
 @Transactional(readOnly = true)
 @Slf4j
 public class ProjectService {
+
+    private final ApplicationEventPublisher eventPublisher;
 
     private final S3Service s3Service;
     private final ProjectRepository projectRepository;
@@ -182,7 +186,7 @@ public class ProjectService {
                                 projectStatusRepository.saveAndFlush(projectStatus);
                                 log.debug("ProjectStatus: {} was updated", projectStatus);
                             } else {
-                                throw new AccessDeniedException("Can't change Project.status because of it has already been changed by someone");
+                                throw new AccessDeniedException("Can't change Project.status because of it has already been changed");
                             }
                         },
                         () -> {

@@ -5,20 +5,20 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableAsync
+@EnableScheduling
 @EnableConfigurationProperties(JwtTokenProperties.class)
 @SpringBootApplication(exclude = UserDetailsServiceAutoConfiguration.class)
 public class IdeasProjectApplication {
 
     public static void main(String[] args) {
         // TODO: 11.07.2023
-        //  Change Project.Status to separate Table (Project.Id,Status) +
-        //  Add Listener to set default values in Project during Persist +
-        //  Add Project.accept() & Project.reject() for Expert +
-        //  Add Optimistic LOCK and inform Expert of exception
-        //  Forbid to change Project after it was estimated +
-        //  Add Project.accept() / Project.reject() Tests (Unit + IT) +
         //  Add User notification when Project is estimated
+        //  Send the notification in Async way
+        //  Add Tests for EmailService
         //
         //  Forbid Expert accept / reject their own Projects
         //
