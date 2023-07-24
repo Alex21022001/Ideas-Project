@@ -27,6 +27,7 @@ class ProjectServiceIT extends IntegrationTestBase {
     private static final Integer PROJECT_ID = 1;
     private static final Integer NEXT_PROJECT_ID = 4;
     private static final Integer USER_1_ID = 1;
+    private static final Integer USER_2_ID = 2;
 
     private final ProjectService projectService;
     private final S3Service s3Service;
@@ -131,30 +132,34 @@ class ProjectServiceIT extends IntegrationTestBase {
 
     @Test
     void acceptProject() {
-        projectService.acceptProject(PROJECT_ID);
+        projectService.acceptProject(PROJECT_ID, USER_2_ID);
+        entityManager.clear();
 
         Optional<Project> project = projectRepository.findById(PROJECT_ID);
-        entityManager.clear();
 
         assertThat(project).isPresent()
                 .map(Project::getStatus)
                 .get()
                 .hasFieldOrPropertyWithValue("status", Status.ACCEPTED)
-                .hasFieldOrPropertyWithValue("version", 1);
+                .hasFieldOrPropertyWithValue("version", 1)
+                .extracting("expert", InstanceOfAssertFactories.type(User.class))
+                .hasFieldOrPropertyWithValue("id", USER_2_ID);
     }
 
     @Test
     void rejectProject() {
-        projectService.rejectProject(PROJECT_ID);
+        projectService.rejectProject(PROJECT_ID, USER_2_ID);
+        entityManager.clear();
 
         Optional<Project> project = projectRepository.findById(PROJECT_ID);
-        entityManager.clear();
 
         assertThat(project).isPresent()
                 .map(Project::getStatus)
                 .get()
                 .hasFieldOrPropertyWithValue("status", Status.REJECTED)
-                .hasFieldOrPropertyWithValue("version", 1);
+                .hasFieldOrPropertyWithValue("version", 1)
+                .extracting("expert", InstanceOfAssertFactories.type(User.class))
+                .hasFieldOrPropertyWithValue("id", USER_2_ID);
     }
 
     @NotNull

@@ -7,8 +7,8 @@ import org.hibernate.annotations.OptimisticLocking;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = "project")
-@EqualsAndHashCode(exclude = "project")
+@ToString(exclude = {"project", "expert"})
+@EqualsAndHashCode(exclude = {"project", "expert"})
 @Data
 @Builder
 @Entity
@@ -24,9 +24,13 @@ public class ProjectStatus {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToOne(optional = false,fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", unique = true, nullable = false)
     private Project project;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "expert_id")
+    private User expert;
 
     @Version
     private Integer version;

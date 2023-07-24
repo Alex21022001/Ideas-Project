@@ -33,6 +33,7 @@ class ProjectServiceTest {
     private static final Integer REACTION_DISLIKES = 1;
     private static final Integer PROJECT_1_ID = 1;
     private static final Integer USER_1_ID = 1;
+    private static final Integer USER_2_ID = 2;
 
     @InjectMocks
     private ProjectService projectService;
@@ -299,7 +300,7 @@ class ProjectServiceTest {
     void acceptNewProject() {
         doReturn(Optional.of(getProjectStatus())).when(projectStatusRepository).findByProjectId(PROJECT_1_ID);
 
-        projectService.acceptProject(PROJECT_1_ID);
+        projectService.acceptProject(PROJECT_1_ID, USER_2_ID);
 
         verify(projectStatusRepository, times(1)).saveAndFlush(projectStatusCaptor.capture());
         assertThat(projectStatusCaptor.getValue()).isNotNull()
@@ -310,7 +311,7 @@ class ProjectServiceTest {
     void rejectNewProject() {
         doReturn(Optional.of(getProjectStatus())).when(projectStatusRepository).findByProjectId(PROJECT_1_ID);
 
-        projectService.rejectProject(PROJECT_1_ID);
+        projectService.rejectProject(PROJECT_1_ID, USER_2_ID);
 
         verify(projectStatusRepository, times(1)).saveAndFlush(projectStatusCaptor.capture());
         assertThat(projectStatusCaptor.getValue()).isNotNull()
@@ -321,14 +322,14 @@ class ProjectServiceTest {
     void acceptNotExistedProject() {
         doReturn(Optional.empty()).when(projectStatusRepository).findByProjectId(PROJECT_1_ID);
 
-        Assertions.assertThrows(NoSuchProjectException.class, () -> projectService.acceptProject(PROJECT_1_ID));
+        Assertions.assertThrows(NoSuchProjectException.class, () -> projectService.acceptProject(PROJECT_1_ID, any()));
     }
 
     @Test
     void acceptAlreadyEstimatedProject() {
         doReturn(Optional.of(getEstimatedProjectStatus())).when(projectStatusRepository).findByProjectId(PROJECT_1_ID);
 
-        Assertions.assertThrows(AccessDeniedException.class, () -> projectService.acceptProject(PROJECT_1_ID));
+        Assertions.assertThrows(AccessDeniedException.class, () -> projectService.acceptProject(PROJECT_1_ID, any()));
     }
 
 

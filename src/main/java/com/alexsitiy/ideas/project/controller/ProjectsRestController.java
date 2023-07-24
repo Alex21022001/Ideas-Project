@@ -173,16 +173,18 @@ public class ProjectsRestController {
     }
 
     @PostMapping("/{id}/accept")
-    public ResponseEntity<?> acceptProject(@PathVariable Integer id) {
-        projectService.acceptProject(id);
+    public ResponseEntity<?> acceptProject(@PathVariable Integer id,
+                                           @AuthenticationPrincipal SecurityUser user) {
+        projectService.acceptProject(id,user.getId());
 
         eventPublisher.publishEvent(new ProjectEstimateEvent(id));
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/reject")
-    public ResponseEntity<?> rejectProject(@PathVariable Integer id) {
-        projectService.rejectProject(id);
+    public ResponseEntity<?> rejectProject(@PathVariable Integer id,
+                                           @AuthenticationPrincipal SecurityUser user) {
+        projectService.rejectProject(id,user.getId());
 
         eventPublisher.publishEvent(new ProjectEstimateEvent(id));
         return ResponseEntity.noContent().build();

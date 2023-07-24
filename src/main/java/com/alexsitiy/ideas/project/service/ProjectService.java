@@ -169,20 +169,21 @@ public class ProjectService {
     }
 
     @Transactional
-    public void acceptProject(Integer projectId) {
-        changeProjectStatus(projectId, Status.ACCEPTED);
+    public void acceptProject(Integer projectId, Integer expertId) {
+        changeProjectStatus(projectId, expertId, Status.ACCEPTED);
     }
 
     @Transactional
-    public void rejectProject(Integer projectId) {
-        changeProjectStatus(projectId, Status.REJECTED);
+    public void rejectProject(Integer projectId, Integer expertId) {
+        changeProjectStatus(projectId, expertId, Status.REJECTED);
     }
 
-    private void changeProjectStatus(Integer projectId, Status status) {
+    private void changeProjectStatus(Integer projectId, Integer expertId, Status status) {
         projectStatusRepository.findByProjectId(projectId)
                 .ifPresentOrElse(projectStatus -> {
                             if (projectStatus.getStatus() == Status.IN_PROGRESS) {
                                 projectStatus.setStatus(status);
+                                projectStatus.setExpert(userRepository.getReferenceById(expertId));
                                 projectStatusRepository.saveAndFlush(projectStatus);
                                 log.debug("ProjectStatus: {} was updated", projectStatus);
                             } else {

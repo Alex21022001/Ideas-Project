@@ -15,6 +15,7 @@ public class ProjectDefaultValueListener {
         ProjectStatus projectStatus = ProjectStatus
                 .builder()
                 .status(Status.IN_PROGRESS)
+                .expert(null)
                 .project(project)
                 .build();
         ProjectReaction projectReaction = new ProjectReaction();

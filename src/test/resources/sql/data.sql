@@ -14,10 +14,10 @@ VALUES (1, 'test1', 'test1-description', 'test1.png', 'test1.pdf', '2023-07-19 0
         (SELECT u.id FROM users u WHERE id = 2));
 SELECT setval('project_id_seq', (SELECT MAX(id) FROM project));
 
-INSERT INTO project_status(id, status, project_id, version)
-VALUES (1, 'IN_PROGRESS', 1, 0),
-       (2, 'REJECTED', 2, 1),
-       (3, 'ACCEPTED', 3, 1);
+INSERT INTO project_status(id, status, project_id, version, expert_id)
+VALUES (1, 'IN_PROGRESS', 1, 0, null),
+       (2, 'REJECTED', 2, 1, 2),
+       (3, 'ACCEPTED', 3, 1, 2);
 SELECT setval('project_status_id_seq', (SELECT MAX(id) FROM project_status));
 
 INSERT INTO comment(id, user_id, project_id, comment_type, commented_at)
