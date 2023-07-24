@@ -52,7 +52,7 @@ public class Project {
     private User user;
 
     @NotAudited
-    @OneToOne(mappedBy = "project", optional = false, cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "project", fetch = FetchType.EAGER, optional = false, cascade = CascadeType.PERSIST)
     private ProjectReaction reaction;
 
     @NotAudited

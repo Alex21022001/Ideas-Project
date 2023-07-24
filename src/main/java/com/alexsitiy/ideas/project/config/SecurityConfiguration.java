@@ -57,6 +57,8 @@ public class SecurityConfiguration {
                                 antMatcher(HttpMethod.GET, "/api/v1/projects/{id}/doc")).permitAll()
                         .requestMatchers(
                                 antMatcher("/api/v1/projects/{id}/accept"),
+                                antMatcher("/api/v1/projects/expert/accepted"),
+                                antMatcher("/api/v1/projects/expert/rejected"),
                                 antMatcher("/api/v1/projects/{id}/reject")).hasAuthority(Role.EXPERT.getAuthority())
                         .requestMatchers(antMatcher("/api/v1/**")).authenticated()
                         .anyRequest().authenticated()

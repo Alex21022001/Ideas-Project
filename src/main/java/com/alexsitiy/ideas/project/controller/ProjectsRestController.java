@@ -86,6 +86,22 @@ public class ProjectsRestController {
         return ResponseEntity.ok(PageResponse.of(projectHistory));
     }
 
+    @GetMapping("/expert/accepted")
+    public ResponseEntity<PageResponse<ProjectReadDto>> findAllAcceptedByExpert(@AuthenticationPrincipal
+                                                                                SecurityUser user,
+                                                                                ProjectSort sort) {
+        Page<ProjectReadDto> projects = projectService.findAllAcceptedByExpert(user.getId(), sort.getPageable());
+        return ResponseEntity.ok(PageResponse.of(projects));
+    }
+
+    @GetMapping("/expert/rejected")
+    public ResponseEntity<PageResponse<ProjectReadDto>> findAllRejectedByExpert(@AuthenticationPrincipal
+                                                                                SecurityUser user,
+                                                                                ProjectSort sort) {
+        Page<ProjectReadDto> projects = projectService.findAllRejectedByExpert(user.getId(), sort.getPageable());
+        return ResponseEntity.ok(PageResponse.of(projects));
+    }
+
     @PostMapping
     public ResponseEntity<ProjectReadDto> create(@Validated ProjectCreateDto projectCreateDto,
                                                  @AuthenticationPrincipal SecurityUser user) {
@@ -175,7 +191,7 @@ public class ProjectsRestController {
     @PostMapping("/{id}/accept")
     public ResponseEntity<?> acceptProject(@PathVariable Integer id,
                                            @AuthenticationPrincipal SecurityUser user) {
-        projectService.acceptProject(id,user.getId());
+        projectService.acceptProject(id, user.getId());
 
         eventPublisher.publishEvent(new ProjectEstimateEvent(id));
         return ResponseEntity.noContent().build();
@@ -184,7 +200,7 @@ public class ProjectsRestController {
     @PostMapping("/{id}/reject")
     public ResponseEntity<?> rejectProject(@PathVariable Integer id,
                                            @AuthenticationPrincipal SecurityUser user) {
-        projectService.rejectProject(id,user.getId());
+        projectService.rejectProject(id, user.getId());
 
         eventPublisher.publishEvent(new ProjectEstimateEvent(id));
         return ResponseEntity.noContent().build();

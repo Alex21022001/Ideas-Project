@@ -21,6 +21,8 @@ public class IdeasProjectApplication {
         //  Add Tests for EmailService
         //  Expert can see projects which they estimated
         //  Forbid Expert accept / reject their own Projects
+        //  Add sort by Status
+        //
         //
         //  Change boolean to void in Project.comment() + Replace Project.existById() with Reaction.findById Check
         //

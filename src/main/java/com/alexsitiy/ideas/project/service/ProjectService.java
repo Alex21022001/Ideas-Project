@@ -2,7 +2,6 @@ package com.alexsitiy.ideas.project.service;
 
 import com.alexsitiy.ideas.project.dto.*;
 import com.alexsitiy.ideas.project.entity.*;
-import com.alexsitiy.ideas.project.event.ProjectEstimateEvent;
 import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectHistoryMapper;
@@ -57,7 +56,7 @@ public class ProjectService {
     }
 
     public Optional<ProjectReadDto> findById(Integer id) {
-        return projectRepository.findByIdWithUserAndReactionAndStatus(id)
+        return projectRepository.findByUserId(id)
                 .map(projectReadMapper::map);
     }
 
@@ -79,6 +78,16 @@ public class ProjectService {
     public Page<ProjectHistoryDto> findAllProjectHistoryByUser(String username, Pageable pageable) {
         return projectRepository.findAllProjectHistoryByUsername(username, pageable)
                 .map(projectHistoryMapper::map);
+    }
+
+    public Page<ProjectReadDto> findAllAcceptedByExpert(Integer id, Pageable pageable) {
+        return projectRepository.findAllByStatusExpertIdAndStatusStatus(id, Status.ACCEPTED, pageable)
+                .map(projectReadMapper::map);
+    }
+
+    public Page<ProjectReadDto> findAllRejectedByExpert(Integer id, Pageable pageable) {
+        return projectRepository.findAllByStatusExpertIdAndStatusStatus(id, Status.REJECTED, pageable)
+                .map(projectReadMapper::map);
     }
 
     public Optional<byte[]> downloadImage(Integer id) {
@@ -114,7 +123,7 @@ public class ProjectService {
 
     @Transactional
     public Optional<ProjectReadDto> update(Integer id, ProjectUpdateDto projectDto) {
-        return projectRepository.findByIdWithUserAndReactionAndStatus(id)
+        return projectRepository.findByUserId(id)
                 .map(project -> {
                     project.setDescription(projectDto.getDescription());
                     project.setTitle(projectDto.getTitle());
@@ -250,6 +259,8 @@ public class ProjectService {
             return s3Service.upload(file, Project.class);
         }
     }
+
+
 }
 
 
