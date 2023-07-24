@@ -19,7 +19,7 @@ public class IdeasProjectApplication {
         //  Add User notification when Project is estimated
         //  Send the notification in Async way
         //  Add Tests for EmailService
-        //
+        //  Expert can see projects which they estimated
         //  Forbid Expert accept / reject their own Projects
         //
         //  Change boolean to void in Project.comment() + Replace Project.existById() with Reaction.findById Check
