@@ -38,7 +38,8 @@ public interface ProjectRepository extends JpaRepository<Project, Integer>,
     @Query("SELECT p FROM Project p " +
            "JOIN FETCH p.user " +
            "JOIN FETCH p.reaction " +
-           "JOIN FETCH p.status s ")
+           "JOIN FETCH p.status s " +
+           "WHERE p.user.id = :userId")
     Page<Project> findAllByUserId(Integer userId, Pageable pageable);
 
     @Query("SELECT p FROM Project p " +
