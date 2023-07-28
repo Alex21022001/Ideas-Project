@@ -17,7 +17,7 @@ public class IdeasProjectApplication {
     public static void main(String[] args) {
         // TODO: 11.07.2023
         //  *SIMPLE*
-        //  Add Notification Table (id,user_id,message,created_at)
+        //  Add Notification Table (id,user_id,message,created_at) +
         //  Using events create Notification
         //  User can get their notifications as NotificationReadDto
         //

@@ -17,10 +17,10 @@ import java.util.List;
 @Builder
 @Entity
 @ToString(exclude = {"user", "comments"})
-@EqualsAndHashCode(exclude = {"user", "comments"})
+@EqualsAndHashCode(exclude = {"user", "comments"}, callSuper = false)
 @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
 @EntityListeners({ProjectDefaultValueListener.class})
-public class Project {
+public class Project extends BasicAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,8 +38,8 @@ public class Project {
     @Column(name = "docs_path")
     private String docPath;
 
-    @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+//    @Column(name = "created_at", nullable = false)
+//    private Instant createdAt;
 
     @NotAudited
     @OneToOne(mappedBy = "project", fetch = FetchType.EAGER, optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE})

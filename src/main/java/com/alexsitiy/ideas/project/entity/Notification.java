@@ -10,9 +10,9 @@ import java.time.Instant;
 @Data
 @Builder
 @ToString(exclude = {"user"})
-@EqualsAndHashCode(exclude = {"user"})
+@EqualsAndHashCode(exclude = {"user"}, callSuper = false)
 @Entity
-public class Notification {
+public class Notification extends BasicAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +21,8 @@ public class Notification {
     @Column(name = "message", nullable = false)
     private String message;
 
-    @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
+//    @Column(name = "created_at", nullable = false)
+//    private Instant createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)

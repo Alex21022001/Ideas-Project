@@ -22,7 +22,6 @@ public class ProjectDefaultValueListener {
 
         projectReaction.setProject(project);
         project.setStatus(projectStatus);
-        project.setCreatedAt(Instant.now());
     }
 
 }
