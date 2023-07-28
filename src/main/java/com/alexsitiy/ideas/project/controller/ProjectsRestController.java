@@ -1,10 +1,10 @@
 package com.alexsitiy.ideas.project.controller;
 
 import com.alexsitiy.ideas.project.dto.*;
+import com.alexsitiy.ideas.project.entity.Status;
 import com.alexsitiy.ideas.project.event.ProjectEstimateEvent;
 import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.security.SecurityUser;
-import com.alexsitiy.ideas.project.service.EmailService;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.validation.ContentType;
 import com.alexsitiy.ideas.project.validation.FileCheck;
@@ -90,7 +90,8 @@ public class ProjectsRestController {
     public ResponseEntity<PageResponse<ProjectReadDto>> findAllAcceptedByExpert(@AuthenticationPrincipal
                                                                                 SecurityUser user,
                                                                                 ProjectSort sort) {
-        Page<ProjectReadDto> projects = projectService.findAllAcceptedByExpert(user.getId(), sort.getPageable());
+        Page<ProjectReadDto> projects = projectService
+                .findAllEstimatedByExpertIdAndStatus(user.getId(), Status.ACCEPTED, sort.getPageable());
         return ResponseEntity.ok(PageResponse.of(projects));
     }
 
@@ -98,7 +99,8 @@ public class ProjectsRestController {
     public ResponseEntity<PageResponse<ProjectReadDto>> findAllRejectedByExpert(@AuthenticationPrincipal
                                                                                 SecurityUser user,
                                                                                 ProjectSort sort) {
-        Page<ProjectReadDto> projects = projectService.findAllRejectedByExpert(user.getId(), sort.getPageable());
+        Page<ProjectReadDto> projects = projectService
+                .findAllEstimatedByExpertIdAndStatus(user.getId(), Status.REJECTED, sort.getPageable());
         return ResponseEntity.ok(PageResponse.of(projects));
     }
 

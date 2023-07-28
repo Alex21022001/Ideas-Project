@@ -22,16 +22,13 @@ public interface ProjectRepository extends JpaRepository<Project, Integer>,
 
     @Override
     @EntityGraph(attributePaths = {"reaction", "status"})
-    Optional<Project> findById(Integer integer);
+    Optional<Project> findById(Integer id);
 
     @EntityGraph(attributePaths = {"user", "reaction", "status"})
     Optional<Project> findByUserId(Integer id);
 
     @Override
-    @Query("SELECT p FROM Project p " +
-           "JOIN FETCH p.user " +
-           "JOIN FETCH p.reaction " +
-           "JOIN FETCH p.status s " )
+    @EntityGraph(attributePaths = {"user", "reaction", "status"})
     Page<Project> findAll(Predicate predicate, Pageable pageable);
 
     @Query("SELECT p FROM Project p " +
@@ -48,11 +45,11 @@ public interface ProjectRepository extends JpaRepository<Project, Integer>,
            "WHERE c.user.id = :userId AND c.type = :type")
     Page<Project> findAllCommentedByUserIdAndCommentType(Integer userId, CommentType type, Pageable pageable);
 
-   @Query("SELECT p FROM Project p " +
-          "JOIN FETCH p.user " +
-          "JOIN FETCH p.reaction " +
-          "JOIN FETCH p.status s " +
-          "WHERE s.status = :status " +
-          "AND s.expert.id = :expertId")
+    @Query("SELECT p FROM Project p " +
+           "JOIN FETCH p.user " +
+           "JOIN FETCH p.reaction " +
+           "JOIN FETCH p.status s " +
+           "WHERE s.status = :status " +
+           "AND s.expert.id = :expertId")
     Page<Project> findAllByStatusExpertIdAndStatusStatus(Integer expertId, Status status, Pageable pageable);
 }

@@ -48,7 +48,7 @@ public class ProjectService {
     public Page<ProjectReadDto> findAll(ProjectFilter filter, Pageable pageable) {
         Predicate predicate = QPredicate.builder()
                 .add(filter.title(), project.title::containsIgnoreCase)
-                .add(filter.statuses(), project.status.status::in)
+                .add(filter.status(), project.status.status::in)
                 .buildAll();
 
         return projectRepository.findAll(predicate, pageable)
@@ -80,13 +80,8 @@ public class ProjectService {
                 .map(projectHistoryMapper::map);
     }
 
-    public Page<ProjectReadDto> findAllAcceptedByExpert(Integer id, Pageable pageable) {
-        return projectRepository.findAllByStatusExpertIdAndStatusStatus(id, Status.ACCEPTED, pageable)
-                .map(projectReadMapper::map);
-    }
-
-    public Page<ProjectReadDto> findAllRejectedByExpert(Integer id, Pageable pageable) {
-        return projectRepository.findAllByStatusExpertIdAndStatusStatus(id, Status.REJECTED, pageable)
+    public Page<ProjectReadDto> findAllEstimatedByExpertIdAndStatus(Integer id, Status status, Pageable pageable) {
+        return projectRepository.findAllByStatusExpertIdAndStatusStatus(id, status, pageable)
                 .map(projectReadMapper::map);
     }
 

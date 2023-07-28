@@ -4,5 +4,5 @@ import com.alexsitiy.ideas.project.entity.Status;
 
 import java.util.List;
 
-public record ProjectFilter(String title, List<Status> statuses) {
+public record ProjectFilter(String title, List<Status> status) {
 }
