@@ -16,7 +16,6 @@ import java.util.List;
 @Data
 @Builder
 @Entity
-@Table
 @ToString(exclude = {"user", "comments"})
 @EqualsAndHashCode(exclude = {"user", "comments"})
 @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)

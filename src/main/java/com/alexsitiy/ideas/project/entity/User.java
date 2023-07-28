@@ -16,8 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
-@ToString(exclude = {"projects", "password", "comments"})
-@EqualsAndHashCode(exclude = {"projects", "comments"})
+@ToString(exclude = {"projects", "password", "comments", "notifications"})
+@EqualsAndHashCode(exclude = {"projects", "comments", "notifications"})
 public class User {
 
     @Id
@@ -50,6 +50,10 @@ public class User {
     @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Notification> notifications = new ArrayList<>();
 
     public void addProject(Project project) {
         projects.add(project);

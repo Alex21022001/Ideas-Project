@@ -16,12 +16,10 @@ public class IdeasProjectApplication {
 
     public static void main(String[] args) {
         // TODO: 11.07.2023
-        //  Add User notification when Project is estimated
-        //  Send the notification in Async way
-        //  Add Tests for EmailService
-        //  Expert can see projects which they estimated
-        //  Forbid Expert accept / reject their own Projects
-        //  Add sort by Status
+        //  *SIMPLE*
+        //  Add Notification Table (id,user_id,message,created_at)
+        //  Using events create Notification
+        //  User can get their notifications as NotificationReadDto
         //
         //
         //  Change boolean to void in Project.comment() + Replace Project.existById() with Reaction.findById Check
