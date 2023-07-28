@@ -3,6 +3,7 @@ package com.alexsitiy.ideas.project.integration.controller;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.entity.Project;
 import com.alexsitiy.ideas.project.entity.Role;
+import com.alexsitiy.ideas.project.entity.Status;
 import com.alexsitiy.ideas.project.repository.ProjectRepository;
 import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.S3Service;
@@ -52,22 +53,77 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                         jsonPath("data", hasSize(2)),
                         jsonPath("metadata.currentPage").value(0),
                         jsonPath("metadata.totalPages").value(2),
-                        jsonPath("metadata.totalElements").value(3));
+                        jsonPath("metadata.totalElements").value(3),
+                        jsonPath("data[0].id").value(1));
 
     }
+
+    @Test
+    void findAllOrderByDislikes() throws Exception {
+        mockMvc.perform(get("/api/v1/projects")
+                        .param("page", "0")
+                        .param("size", "2")
+                        .param("sort", "dislikes")
+                        .param("title", "test"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("data", hasSize(2)),
+                        jsonPath("metadata.currentPage").value(0),
+                        jsonPath("metadata.totalPages").value(2),
+                        jsonPath("metadata.totalElements").value(3),
+                        jsonPath("data[0].id").value(3),
+                        jsonPath("data[1].id").value(2));
+
+    }
+
+    @Test
+    void findAllOrderByCreatedAt() throws Exception {
+        mockMvc.perform(get("/api/v1/projects")
+                        .param("page", "0")
+                        .param("size", "2")
+                        .param("sort", "new")
+                        .param("title", "test"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("data", hasSize(2)),
+                        jsonPath("metadata.currentPage").value(0),
+                        jsonPath("metadata.totalPages").value(2),
+                        jsonPath("metadata.totalElements").value(3),
+                        jsonPath("data[0].id").value(3));
+    }
+
+    @Test
+    void findAllWithFilter() throws Exception {
+        mockMvc.perform(get("/api/v1/projects")
+                        .param("page", "0")
+                        .param("size", "2")
+                        .param("sort", "likes")
+                        .param("status", Status.ACCEPTED.name(), Status.REJECTED.name()))
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("data", hasSize(2)),
+                        jsonPath("metadata.currentPage").value(0),
+                        jsonPath("metadata.totalPages").value(1),
+                        jsonPath("metadata.totalElements").value(2),
+                        jsonPath("data[0].id").value(2),
+                        jsonPath("data[1].id").value(3));
+    }
+
 
     @Test
     void findAllByUser() throws Exception {
         mockMvc.perform(get("/api/v1/projects/user")
                         .queryParam("page", "0")
-                        .queryParam("size", "1")
-                        .queryParam("sort", "dislikes"))
+                        .queryParam("size", "2")
+                        .queryParam("sort", "new,dislikes"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpectAll(
-                        jsonPath("data", hasSize(1)),
+                        jsonPath("data", hasSize(2)),
                         jsonPath("metadata.currentPage").value(0),
-                        jsonPath("metadata.totalPages").value(2),
-                        jsonPath("metadata.totalElements").value(2)
+                        jsonPath("metadata.totalPages").value(1),
+                        jsonPath("metadata.totalElements").value(2),
+                        jsonPath("data[0].id").value(2),
+                        jsonPath("data[1].id").value(1)
                 );
     }
 
@@ -76,13 +132,14 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
         mockMvc.perform(get("/api/v1/projects/user/liked")
                         .queryParam("page", "0")
                         .queryParam("size", "2")
-                        .queryParam("sort", "dislikes"))
+                        .queryParam("sort", "likes"))
                 .andExpect(status().is2xxSuccessful())
                 .andExpectAll(
                         jsonPath("data", hasSize(2)),
                         jsonPath("metadata.currentPage").value(0),
                         jsonPath("metadata.totalPages").value(1),
-                        jsonPath("metadata.totalElements").value(2)
+                        jsonPath("metadata.totalElements").value(2),
+                        jsonPath("data[0].id").value(1)
                 );
     }
 
@@ -98,6 +155,40 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
                         jsonPath("metadata.currentPage").value(0),
                         jsonPath("metadata.totalPages").value(1),
                         jsonPath("metadata.totalElements").value(1)
+                );
+    }
+
+    @Test
+    @WithUserDetails("test2@gmail.com")
+    void findAllAcceptedByExpert() throws Exception {
+        mockMvc.perform(get("/api/v1/projects/expert/accepted")
+                        .queryParam("page","0")
+                        .queryParam("size","1")
+                        .queryParam("sort","new"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("data", hasSize(1)),
+                        jsonPath("metadata.currentPage").value(0),
+                        jsonPath("metadata.totalPages").value(1),
+                        jsonPath("metadata.totalElements").value(1),
+                        jsonPath("data[0].id").value(3)
+                );
+    }
+
+    @Test
+    @WithUserDetails("test2@gmail.com")
+    void findAllRejectedByExpert() throws Exception {
+        mockMvc.perform(get("/api/v1/projects/expert/rejected")
+                        .queryParam("page","0")
+                        .queryParam("size","1")
+                        .queryParam("sort","new"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpectAll(
+                        jsonPath("data", hasSize(1)),
+                        jsonPath("metadata.currentPage").value(0),
+                        jsonPath("metadata.totalPages").value(1),
+                        jsonPath("metadata.totalElements").value(1),
+                        jsonPath("data[0].id").value(2)
                 );
     }
 
@@ -371,7 +462,6 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
     @Nested
     class ProjectRestControllerAuthTest {
 
-
         @Test
         void updateWithInvalidUser() throws Exception {
             int projectId = 3;
@@ -438,14 +528,14 @@ class ProjectsRestControllerTest extends RestIntegrationTestBase {
         @Test
         @WithUserDetails("test1@gmail.com")
         void acceptProjectWithInvalidUser() throws Exception {
-            mockMvc.perform(post("/api/v1/projects/{id}/accept",PROJECT_1_ID))
+            mockMvc.perform(post("/api/v1/projects/{id}/accept", PROJECT_1_ID))
                     .andExpect(status().isForbidden());
         }
 
         @Test
         @WithUserDetails("test1@gmail.com")
         void rejectProjectWithInvalidUser() throws Exception {
-            mockMvc.perform(post("/api/v1/projects/{id}/reject",PROJECT_1_ID))
+            mockMvc.perform(post("/api/v1/projects/{id}/reject", PROJECT_1_ID))
                     .andExpect(status().isForbidden());
         }
     }
