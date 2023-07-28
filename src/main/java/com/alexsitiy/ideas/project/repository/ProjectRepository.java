@@ -24,8 +24,12 @@ public interface ProjectRepository extends JpaRepository<Project, Integer>,
     @EntityGraph(attributePaths = {"reaction", "status"})
     Optional<Project> findById(Integer id);
 
-    @EntityGraph(attributePaths = {"user", "reaction", "status"})
-    Optional<Project> findByUserId(Integer id);
+    @Query("SELECT p FROM Project p " +
+           "JOIN FETCH p.user " +
+           "JOIN FETCH p.reaction " +
+           "JOIN FETCH p.status s " +
+           "WHERE p.id = :id")
+    Optional<Project> findByIdWithUser(Integer id);
 
     @Override
     @EntityGraph(attributePaths = {"user", "reaction", "status"})

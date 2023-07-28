@@ -22,7 +22,7 @@ public class OnProjectEstimateListener {
     @EventListener
     @Transactional(readOnly = true)
     public void sendEmailToUser(ProjectEstimateEvent event) {
-        projectRepository.findByUserId(event.getProjectId())
+        projectRepository.findByIdWithUser(event.getProjectId())
                 .ifPresent(emailService::sendStatusNotificationEmail);
     }
 

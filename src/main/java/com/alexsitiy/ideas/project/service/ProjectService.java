@@ -56,7 +56,7 @@ public class ProjectService {
     }
 
     public Optional<ProjectReadDto> findById(Integer id) {
-        return projectRepository.findByUserId(id)
+        return projectRepository.findByIdWithUser(id)
                 .map(projectReadMapper::map);
     }
 
@@ -118,7 +118,7 @@ public class ProjectService {
 
     @Transactional
     public Optional<ProjectReadDto> update(Integer id, ProjectUpdateDto projectDto) {
-        return projectRepository.findByUserId(id)
+        return projectRepository.findByIdWithUser(id)
                 .map(project -> {
                     project.setDescription(projectDto.getDescription());
                     project.setTitle(projectDto.getTitle());
