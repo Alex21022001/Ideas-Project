@@ -5,7 +5,7 @@ import jakarta.persistence.PrePersist;
 
 import java.time.Instant;
 
-public class CreateAtSetListener {
+public class CreatedAtSetListener {
 
     @PrePersist
     public void setCreatedAt(BasicAuditEntity basicAuditEntity){

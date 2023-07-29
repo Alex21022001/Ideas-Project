@@ -1,8 +1,10 @@
 package com.alexsitiy.ideas.project.controller;
 
 import com.alexsitiy.ideas.project.dto.*;
+import com.alexsitiy.ideas.project.entity.CommentType;
 import com.alexsitiy.ideas.project.entity.Status;
-import com.alexsitiy.ideas.project.event.ProjectEstimateEvent;
+import com.alexsitiy.ideas.project.event.ProjectCommentedEvent;
+import com.alexsitiy.ideas.project.event.ProjectEstimationEvent;
 import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.ProjectService;
@@ -180,6 +182,8 @@ public class ProjectsRestController {
     public ResponseEntity<?> likeProject(@PathVariable Integer id,
                                          @AuthenticationPrincipal SecurityUser user) {
         projectService.likeProject(id, user.getId());
+
+        eventPublisher.publishEvent(new ProjectCommentedEvent(id,user.getId(), CommentType.LIKE));
         return ResponseEntity.noContent().build();
     }
 
@@ -195,7 +199,7 @@ public class ProjectsRestController {
                                            @AuthenticationPrincipal SecurityUser user) {
         projectService.acceptProject(id, user.getId());
 
-        eventPublisher.publishEvent(new ProjectEstimateEvent(id));
+        eventPublisher.publishEvent(new ProjectEstimationEvent(id,user.getId()));
         return ResponseEntity.noContent().build();
     }
 
@@ -204,7 +208,7 @@ public class ProjectsRestController {
                                            @AuthenticationPrincipal SecurityUser user) {
         projectService.rejectProject(id, user.getId());
 
-        eventPublisher.publishEvent(new ProjectEstimateEvent(id));
+        eventPublisher.publishEvent(new ProjectEstimationEvent(id,user.getId()));
         return ResponseEntity.noContent().build();
     }
 

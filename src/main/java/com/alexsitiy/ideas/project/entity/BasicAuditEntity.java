@@ -1,6 +1,6 @@
 package com.alexsitiy.ideas.project.entity;
 
-import com.alexsitiy.ideas.project.listener.CreateAtSetListener;
+import com.alexsitiy.ideas.project.listener.CreatedAtSetListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -10,7 +10,7 @@ import java.time.Instant;
 
 @Data
 @MappedSuperclass
-@EntityListeners({CreateAtSetListener.class})
+@EntityListeners({CreatedAtSetListener.class})
 public class BasicAuditEntity {
 
     @Column(name = "created_at")

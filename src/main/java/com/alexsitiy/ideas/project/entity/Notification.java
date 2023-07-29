@@ -9,8 +9,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @Data
 @Builder
-@ToString(exclude = {"user"})
-@EqualsAndHashCode(exclude = {"user"}, callSuper = false)
+@ToString(exclude = {"user","caller","project"})
+@EqualsAndHashCode(exclude = {"user","caller","project"},callSuper = false)
 @Entity
 public class Notification extends BasicAuditEntity {
 
@@ -21,10 +21,23 @@ public class Notification extends BasicAuditEntity {
     @Column(name = "message", nullable = false)
     private String message;
 
-//    @Column(name = "created_at", nullable = false)
-//    private Instant createdAt;
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "caller_id")
+    private User caller;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+   public enum NotificationType {
+        STATUS,
+        COMMENT
+    }
 }
