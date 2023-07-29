@@ -24,6 +24,12 @@ public class Notification extends BasicAuditEntity {
     @Enumerated(EnumType.STRING)
     private NotificationType type;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    @Enumerated(EnumType.STRING)
+    private CommentType comment;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     private Project project;

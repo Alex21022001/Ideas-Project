@@ -191,6 +191,8 @@ public class ProjectsRestController {
     public ResponseEntity<?> dislikeProject(@PathVariable Integer id,
                                             @AuthenticationPrincipal SecurityUser user) {
         projectService.dislikeProject(id, user.getId());
+
+        eventPublisher.publishEvent(new ProjectCommentedEvent(id,user.getId(), CommentType.DISLIKE));
         return ResponseEntity.noContent().build();
     }
 

@@ -14,6 +14,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -27,13 +29,28 @@ public class OnProjectCommentedListener {
     @EventListener
     @Transactional
     public void createNotificationForUser(ProjectCommentedEvent event) {
-        projectRepository.findByIdWithUser(event.getProjectId())
-                .ifPresent(project -> notificationRepository
-                        .findByProjectIdAndCallerIdAndType(event.getProjectId(), event.getCallerId(), Notification.NotificationType.COMMENT)
-                        .ifPresentOrElse(notification -> {
+        notificationRepository
+                .findByProjectIdAndCallerIdAndType(event.getProjectId(), event.getCallerId(), Notification.NotificationType.COMMENT)
+                .ifPresentOrElse(notification -> {
+                            if (notification.getComment() == event.getCommentType()) {
+                                notificationRepository.delete(notification);
+                                notificationRepository.flush();
+                                log.debug("Notification: {} was deleted because of User has deleted their comment", notification);
+                            } else {
+                                String message = notification.getMessage();
+                                String newMessage = event.getCommentType() == CommentType.LIKE ?
+                                        message.replace("disliked", "liked") :
+                                        message.replace("liked", "disliked");
 
-                                },
-                                () -> {
+                                notification.setMessage(newMessage);
+                                notification.setComment(event.getCommentType());
+                                notification.setCreatedAt(Instant.now());
+                                notificationRepository.saveAndFlush(notification);
+                                log.debug("Notification comment was changed to {} because of User has changed their comment", event.getCommentType());
+                            }
+                        },
+                        () -> projectRepository.findByIdWithUser(event.getProjectId())
+                                .ifPresent(project -> {
                                     User caller = userRepository.findById(event.getCallerId()).get();
 
                                     String message = "Your project [%s] was %s by %s %s"
@@ -45,6 +62,7 @@ public class OnProjectCommentedListener {
                                     Notification notification = Notification.builder()
                                             .user(project.getUser())
                                             .type(Notification.NotificationType.COMMENT)
+                                            .comment(event.getCommentType())
                                             .message(message)
                                             .project(project)
                                             .caller(caller)
@@ -52,7 +70,6 @@ public class OnProjectCommentedListener {
 
                                     notificationRepository.saveAndFlush(notification);
                                     log.debug("Notification: {} was created", notification);
-                                })
-                );
+                                }));
     }
 }
