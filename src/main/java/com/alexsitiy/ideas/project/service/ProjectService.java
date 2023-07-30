@@ -2,6 +2,10 @@ package com.alexsitiy.ideas.project.service;
 
 import com.alexsitiy.ideas.project.dto.*;
 import com.alexsitiy.ideas.project.entity.*;
+import com.alexsitiy.ideas.project.event.ProjectCommentDeletedEvent;
+import com.alexsitiy.ideas.project.event.ProjectCommentUpdatedEvent;
+import com.alexsitiy.ideas.project.event.ProjectCommentedEvent;
+import com.alexsitiy.ideas.project.event.ProjectEstimationEvent;
 import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectHistoryMapper;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static com.alexsitiy.ideas.project.entity.QProject.project;
@@ -33,10 +38,12 @@ public class ProjectService {
     private final ApplicationEventPublisher eventPublisher;
 
     private final S3Service s3Service;
+    private final CommentService commentService;
+
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
     private final ReactionRepository reactionRepository;
+    private final CommentRepository commentRepository;
     private final ProjectStatusRepository projectStatusRepository;
 
     private final ProjectCreateMapper projectCreateMapper;
@@ -189,6 +196,7 @@ public class ProjectService {
                                 projectStatus.setStatus(status);
                                 projectStatus.setExpert(userRepository.getReferenceById(expertId));
                                 projectStatusRepository.saveAndFlush(projectStatus);
+                                eventPublisher.publishEvent(new ProjectEstimationEvent(projectId, expertId, status));
                                 log.debug("ProjectStatus: {} was updated", projectStatus);
                             } else {
                                 throw new AccessDeniedException("Can't change Project.status because of it has already been changed");
@@ -204,10 +212,19 @@ public class ProjectService {
         reactionRepository.findByIdWithLock(projectId)
                 .ifPresentOrElse(
                         reaction -> commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
-                                .ifPresentOrElse(comment ->
-                                                handleExistingComment(commentType, reaction, comment),
+                                .ifPresentOrElse(
+                                        comment -> {
+                                            if (comment.getType().equals(commentType)) {
+                                                deleteExistedComment(commentType, reaction, comment);
+                                                eventPublisher.publishEvent(new ProjectCommentDeletedEvent(projectId, userId));
+                                            } else {
+                                                updateExistedComment(commentType, reaction, comment);
+                                                eventPublisher.publishEvent(new ProjectCommentUpdatedEvent(projectId, userId, commentType));
+                                            }
+                                        },
                                         () -> {
-                                            handleNotExistingComment(projectId, userId, commentType, reaction);
+                                            createComment(projectId, userId, commentType, reaction);
+                                            eventPublisher.publishEvent(new ProjectCommentedEvent(projectId, userId, commentType));
                                         }),
                         () -> {
                             throw new NoSuchProjectException("There is no such Project with id:" + projectId);
@@ -215,37 +232,30 @@ public class ProjectService {
 
     }
 
-    private void handleExistingComment(CommentType commentType, ProjectReaction projectReaction, Comment comment) {
-        if (comment.getType().equals(commentType)) {
-            projectReaction.decrement(commentType);
-// TODO: 30.07.2023 On Comment deleted
-            reactionRepository.save(projectReaction);
-            commentRepository.delete(comment);
-            commentRepository.flush();
-            log.debug("Comment: {} was deleted", comment);
-            log.debug("Reaction: {}, {}s were decremented", projectReaction, commentType.name().toLowerCase());
-        } else {
-            comment.setType(commentType);
-            projectReaction.change(commentType);
-// TODO: 30.07.2023 On Comment updated
-            reactionRepository.save(projectReaction);
-            commentRepository.save(comment);
-            commentRepository.flush();
-            log.debug("Comment: {} was updated. CommentType was changed to {}", comment, commentType);
-            log.debug("Reaction: {}, {}s were incremented", projectReaction, commentType.name().toLowerCase());
-        }
+    private void updateExistedComment(CommentType commentType, ProjectReaction reaction, Comment comment) {
+        reaction.change(commentType);
+
+        commentService.update(comment, commentType);
+        reactionRepository.save(reaction);
+        entityManager.flush();
+        log.debug("Reaction: {}, {}s were incremented", reaction, commentType.name().toLowerCase());
     }
 
-    private void handleNotExistingComment(Integer projectId, Integer userId, CommentType commentType, ProjectReaction projectReaction) {
-        Comment comment = Comment.of(
-                projectRepository.getReferenceById(projectId),
-                userRepository.getReferenceById(userId),
-                commentType);
-        projectReaction.increment(commentType);
-// TODO: 30.07.2023 On Comment created
-        commentRepository.save(comment);
-        reactionRepository.saveAndFlush(projectReaction);
-        log.debug("User with ID: {} {}ED Project: {}. Current Reactions: {}", userId, commentType, projectId, projectReaction);
+    private void deleteExistedComment(CommentType commentType, ProjectReaction reaction, Comment comment) {
+        reaction.decrement(commentType);
+
+        commentService.delete(comment);
+        reactionRepository.save(reaction);
+        entityManager.flush();
+        log.debug("Reaction: {}, {}s were decremented", reaction, commentType.name().toLowerCase());
+    }
+
+    private void createComment(Integer projectId, Integer userId, CommentType commentType, ProjectReaction reaction) {
+        reaction.increment(commentType);
+
+        commentService.create(projectId, userId, commentType);
+        reactionRepository.saveAndFlush(reaction);
+        log.debug("User with ID: {} {}ED Project: {}. Current Reactions: {}", userId, commentType, projectId, reaction);
     }
 
     private Optional<String> uploadFile(MultipartFile file) {

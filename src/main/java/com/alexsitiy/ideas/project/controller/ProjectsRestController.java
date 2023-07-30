@@ -32,7 +32,6 @@ public class ProjectsRestController {
 
     private final ProjectService projectService;
 
-    private final ApplicationEventPublisher eventPublisher;
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjectReadDto> findById(@PathVariable Integer id) {
@@ -183,7 +182,6 @@ public class ProjectsRestController {
                                          @AuthenticationPrincipal SecurityUser user) {
         projectService.likeProject(id, user.getId());
 
-        eventPublisher.publishEvent(new ProjectCommentedEvent(id,user.getId(), CommentType.LIKE));
         return ResponseEntity.noContent().build();
     }
 
@@ -192,7 +190,6 @@ public class ProjectsRestController {
                                             @AuthenticationPrincipal SecurityUser user) {
         projectService.dislikeProject(id, user.getId());
 
-        eventPublisher.publishEvent(new ProjectCommentedEvent(id,user.getId(), CommentType.DISLIKE));
         return ResponseEntity.noContent().build();
     }
 
@@ -201,7 +198,6 @@ public class ProjectsRestController {
                                            @AuthenticationPrincipal SecurityUser user) {
         projectService.acceptProject(id, user.getId());
 
-        eventPublisher.publishEvent(new ProjectEstimationEvent(id,user.getId(),Status.ACCEPTED));
         return ResponseEntity.noContent().build();
     }
 
@@ -210,7 +206,6 @@ public class ProjectsRestController {
                                            @AuthenticationPrincipal SecurityUser user) {
         projectService.rejectProject(id, user.getId());
 
-        eventPublisher.publishEvent(new ProjectEstimationEvent(id,user.getId(),Status.REJECTED));
         return ResponseEntity.noContent().build();
     }
 
