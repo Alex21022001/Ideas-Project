@@ -201,7 +201,7 @@ public class ProjectsRestController {
                                            @AuthenticationPrincipal SecurityUser user) {
         projectService.acceptProject(id, user.getId());
 
-        eventPublisher.publishEvent(new ProjectEstimationEvent(id,user.getId()));
+        eventPublisher.publishEvent(new ProjectEstimationEvent(id,user.getId(),Status.ACCEPTED));
         return ResponseEntity.noContent().build();
     }
 
@@ -210,7 +210,7 @@ public class ProjectsRestController {
                                            @AuthenticationPrincipal SecurityUser user) {
         projectService.rejectProject(id, user.getId());
 
-        eventPublisher.publishEvent(new ProjectEstimationEvent(id,user.getId()));
+        eventPublisher.publishEvent(new ProjectEstimationEvent(id,user.getId(),Status.REJECTED));
         return ResponseEntity.noContent().build();
     }
 

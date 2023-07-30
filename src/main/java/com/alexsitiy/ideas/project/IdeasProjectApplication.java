@@ -16,10 +16,13 @@ public class IdeasProjectApplication {
 
     public static void main(String[] args) {
         // TODO: 11.07.2023
-        //  *Advanced*
-        //  Create notification via OnProjectEstimationListener
-        //  Add Test
-        //  Create notification on Comment
+        //  Divide Notification into CommentNotification and EstimationNotification
+        //  Change NotificationService, use both CommentNotificationRepository and EstimationNotificationRepository
+        //  Add Endpoint in UserController for User's notification
+        //  Add NotificationSort or use Pageable for Pagination
+        //  Add Tests
+        //
+        //
         //
         //  Change boolean to void in Project.comment() + Replace Project.existById() with Reaction.findById Check
         //

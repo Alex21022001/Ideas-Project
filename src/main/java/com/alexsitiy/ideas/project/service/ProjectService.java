@@ -202,7 +202,8 @@ public class ProjectService {
 
     private void comment(Integer projectId, Integer userId, CommentType commentType) {
         reactionRepository.findByIdWithLock(projectId)
-                .ifPresentOrElse(reaction -> commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
+                .ifPresentOrElse(
+                        reaction -> commentRepository.findCommentByProjectIdAndUserId(projectId, userId)
                                 .ifPresentOrElse(comment ->
                                                 handleExistingComment(commentType, reaction, comment),
                                         () -> {
@@ -217,7 +218,7 @@ public class ProjectService {
     private void handleExistingComment(CommentType commentType, ProjectReaction projectReaction, Comment comment) {
         if (comment.getType().equals(commentType)) {
             projectReaction.decrement(commentType);
-
+// TODO: 30.07.2023 On Comment deleted
             reactionRepository.save(projectReaction);
             commentRepository.delete(comment);
             commentRepository.flush();
@@ -226,7 +227,7 @@ public class ProjectService {
         } else {
             comment.setType(commentType);
             projectReaction.change(commentType);
-
+// TODO: 30.07.2023 On Comment updated
             reactionRepository.save(projectReaction);
             commentRepository.save(comment);
             commentRepository.flush();
@@ -241,7 +242,7 @@ public class ProjectService {
                 userRepository.getReferenceById(userId),
                 commentType);
         projectReaction.increment(commentType);
-
+// TODO: 30.07.2023 On Comment created
         commentRepository.save(comment);
         reactionRepository.saveAndFlush(projectReaction);
         log.debug("User with ID: {} {}ED Project: {}. Current Reactions: {}", userId, commentType, projectId, projectReaction);
