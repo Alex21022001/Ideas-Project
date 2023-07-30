@@ -4,18 +4,24 @@ import com.alexsitiy.ideas.project.dto.ProjectCreateDto;
 import com.alexsitiy.ideas.project.dto.ProjectReadDto;
 import com.alexsitiy.ideas.project.dto.ProjectUpdateDto;
 import com.alexsitiy.ideas.project.entity.*;
+import com.alexsitiy.ideas.project.event.ProjectCommentDeletedEvent;
+import com.alexsitiy.ideas.project.event.ProjectCommentUpdatedEvent;
+import com.alexsitiy.ideas.project.event.ProjectCommentedEvent;
 import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.mapper.ProjectCreateMapper;
 import com.alexsitiy.ideas.project.mapper.ProjectReadMapper;
 import com.alexsitiy.ideas.project.repository.*;
+import com.alexsitiy.ideas.project.service.CommentService;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.service.S3Service;
+import jakarta.persistence.EntityManager;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -39,6 +45,8 @@ class ProjectServiceTest {
     private ProjectService projectService;
     @Mock
     private S3Service s3Service;
+    @Mock
+    private CommentService commentService;
 
     @Mock
     private ProjectRepository projectRepository;
@@ -51,6 +59,10 @@ class ProjectServiceTest {
     @Mock
     private ProjectStatusRepository projectStatusRepository;
 
+    @Mock
+    private EntityManager entityManager;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @Mock
     private ProjectReadMapper projectReadMapper;
@@ -225,13 +237,11 @@ class ProjectServiceTest {
 
         projectService.likeProject(PROJECT_1_ID, USER_1_ID);
 
-        verify(commentRepository, times(1)).save(commentCaptor.capture());
+        verify(commentService, times(1)).create(PROJECT_1_ID, USER_1_ID, CommentType.LIKE);
         verify(reactionRepository, times(1)).saveAndFlush(reactionCaptor.capture());
-        verify(commentRepository, never()).saveAndFlush(any());
-        verify(commentRepository, never()).delete(any());
-        assertThat(commentCaptor.getValue())
-                .isNotNull()
-                .hasFieldOrPropertyWithValue("type", CommentType.LIKE);
+        verify(eventPublisher,times(1)).publishEvent(any(ProjectCommentedEvent.class));
+        verify(commentService, Mockito.never()).update(any(Comment.class),eq(CommentType.LIKE));
+        verify(commentService, Mockito.never()).delete(any());
         assertThat(reactionCaptor.getValue())
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("likes", REACTION_LIKES + 1)
@@ -250,10 +260,11 @@ class ProjectServiceTest {
 
         projectService.likeProject(PROJECT_1_ID, USER_1_ID);
 
-        verify(commentRepository, times(1)).delete(commentCaptor.capture());
+        verify(commentService, times(1)).delete(commentCaptor.capture());
         verify(reactionRepository, times(1)).save(reactionCaptor.capture());
-        verify(commentRepository, Mockito.never()).save(any());
-        verify(commentRepository, Mockito.never()).saveAndFlush(any());
+        verify(eventPublisher,times(1)).publishEvent(any(ProjectCommentDeletedEvent.class));
+        verify(commentService, Mockito.never()).update(any(Comment.class),eq(CommentType.LIKE));
+        verify(commentService, Mockito.never()).create(any(),any(),any());
         assertThat(commentCaptor.getValue())
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("type", CommentType.LIKE);
@@ -274,13 +285,14 @@ class ProjectServiceTest {
 
         projectService.likeProject(PROJECT_1_ID, USER_1_ID);
 
-        verify(commentRepository, times(1)).save(commentCaptor.capture());
+        verify(commentService, times(1)).update(commentCaptor.capture(),eq(CommentType.LIKE));
         verify(reactionRepository, times(1)).save(reactionCaptor.capture());
-        verify(commentRepository, Mockito.never()).saveAndFlush(any());
-        verify(commentRepository, Mockito.never()).delete(any());
+        verify(eventPublisher,times(1)).publishEvent(any(ProjectCommentUpdatedEvent.class));
+        verify(commentService, Mockito.never()).create(any(),any(),any());
+        verify(commentService, Mockito.never()).delete(any());
         assertThat(commentCaptor.getValue())
                 .isNotNull()
-                .hasFieldOrPropertyWithValue("type", CommentType.LIKE);
+                .hasFieldOrPropertyWithValue("type", CommentType.DISLIKE);
         assertThat(reactionCaptor.getValue())
                 .isNotNull()
                 .hasFieldOrPropertyWithValue("likes", REACTION_LIKES + 1)
