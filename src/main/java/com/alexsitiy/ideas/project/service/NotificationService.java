@@ -53,8 +53,8 @@ public class NotificationService {
     public void deleteNotificationOnCommentDeleted(Integer projectId, Integer callerId) {
        commentNotificationRepository.findByProjectIdAndCallerId(projectId, callerId)
                 .ifPresent(notification -> {
-                    notificationRepository.delete(notification);
-                    notificationRepository.flush();
+                    commentNotificationRepository.delete(notification);
+                    commentNotificationRepository.flush();
                     log.debug("Notification: {} was deleted, due to User with ID: {} deleted their comment", notification, callerId);
                 });
     }

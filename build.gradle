@@ -7,7 +7,7 @@ plugins {
     id 'jacoco'
 }
 
-apply from:'version.gradle'
+apply from: 'version.gradle'
 
 group = 'com.alexsitiy'
 version = '0.0.1-SNAPSHOT'
@@ -17,7 +17,7 @@ java {
 }
 
 configurations {
-    querydsl.extendsFrom annotationProcessor,implementation,compileOnly,runtimeOnly
+    querydsl.extendsFrom annotationProcessor, implementation, compileOnly, runtimeOnly
 }
 
 repositories {
@@ -69,14 +69,18 @@ test {
 jacocoTestReport {
     dependsOn test
 }
-jacocoTestCoverageVerification{
-    violationRules{
+jacocoTestCoverageVerification {
+    violationRules {
         rule {
             limit {
                 minimum = 0.5
             }
         }
     }
+}
+task openJacocoReport(type: Exec) {
+    group 'verification'
+    commandLine 'cmd', '/c', 'start', '', project.file('build/reports/jacoco/test/html/index.html').toString()
 }
 
 tasks.named('test') {

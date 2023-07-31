@@ -35,4 +35,17 @@ INSERT INTO project_reaction(id, likes, dislikes, project_id)
 VALUES (1, 2, 0, 1),
        (2, 1, 1, 2),
        (3, 0, 2, 3);
-SELECT setval('project_reaction_id_seq', (SELECT MAX(id) FROM project_reaction))
+SELECT setval('project_reaction_id_seq', (SELECT MAX(id) FROM project_reaction));
+
+INSERT INTO notification(id, message, created_at, type, status, comment, project_id, user_id, caller_id)
+VALUES (1, 'Your Project: [test2] was rejected by TestExpert TestExpert',
+        '2023-07-09 18:36:06.981997', 'STATUS', 'REJECTED', null, 2, 1, 2),
+       (2, 'Your Project: [test3] was accepted by TestExpert TestExpert',
+        '2023-07-09 18:36:06.981997', 'STATUS', 'ACCEPTED', null, 3, 2, 2),
+       (3, 'Your Project: [test1] was liked by TestExpert TestExpert',
+        '2023-07-09 18:36:06.981997', 'COMMENT', 'LIKE', null, 1, 1, 2),
+       (4, 'Your Project: [test2] was disliked by TestExpert TestExpert',
+        '2023-07-09 18:36:06.981997', 'COMMENT', 'DISLIKE', null, 2, 1, 2),
+       (5, 'Your Project: [test3] was disliked by TestExpert TestExpert',
+        '2023-07-09 18:36:06.981997', 'COMMENT', 'DISLIKE', null, 3, 2, 2);
+SELECT setval('notification_id_seq', (SELECT MAX(id) FROM notification));
