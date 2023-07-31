@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RequiredArgsConstructor
 class AuthServiceIT extends IntegrationTestBase {
 
-    private static final Integer NEXT_USER_ID = 3;
+    private static final Integer NEXT_USER_ID = 4;
 
     private final AuthService authService;
     private final UserRepository userRepository;
@@ -26,8 +26,8 @@ class AuthServiceIT extends IntegrationTestBase {
 
     @Test
     void register() {
-        String username = "test3@gmail.com";
-        RegisterRequest request = new RegisterRequest("Test3","Test3", username,"123");
+        String username = "test4@gmail.com";
+        RegisterRequest request = new RegisterRequest("Test4","Test4", username,"123");
         AuthenticationResponse expected = authService.register(request);
 
         entityManager.clear();

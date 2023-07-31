@@ -30,12 +30,11 @@ class AuthRestControllerTest extends RestIntegrationTestBase {
     @Test
     @WithAnonymousUser
     void register() throws Exception {
-        RegisterRequest request = new RegisterRequest("Test3", "Test3", "test3@gmail.com", "123");
-
-        mockMvc.perform(post(BASE_URL+"/register")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(request)))
+        RegisterRequest request = new RegisterRequest("Test4", "Test4", "test4@gmail.com", "123");
+        mockMvc.perform(post(BASE_URL + "/register")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request)))
                 .andExpect(status().is(201))
                 .andExpect(jsonPath("token").isString());
     }
@@ -45,7 +44,7 @@ class AuthRestControllerTest extends RestIntegrationTestBase {
     void registerWithInvalidData() throws Exception {
         RegisterRequest request = new RegisterRequest("Te", "Test3", "test1@gmail.com", "");
 
-        mockMvc.perform(post(BASE_URL+"/register")
+        mockMvc.perform(post(BASE_URL + "/register")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request)))
@@ -59,9 +58,9 @@ class AuthRestControllerTest extends RestIntegrationTestBase {
         AuthenticationRequest request = new AuthenticationRequest("test1@gmail.com", "123");
 
         mockMvc.perform(post("/auth/login")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(toJson(request)))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(toJson(request)))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.token", is(notNullValue())));
     }
@@ -75,6 +74,6 @@ class AuthRestControllerTest extends RestIntegrationTestBase {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(toJson(request)))
                 .andExpect(status().is(400))
-                .andExpect(jsonPath("$.error",is(notNullValue())));
+                .andExpect(jsonPath("$.error", is(notNullValue())));
     }
 }

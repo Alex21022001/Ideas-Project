@@ -232,15 +232,6 @@ public class ProjectService {
 
     }
 
-    private void updateExistedComment(CommentType commentType, ProjectReaction reaction, Comment comment) {
-        reaction.change(commentType);
-
-        commentService.update(comment, commentType);
-        reactionRepository.save(reaction);
-        entityManager.flush();
-        log.debug("Reaction: {}, {}s were incremented", reaction, commentType.name().toLowerCase());
-    }
-
     private void deleteExistedComment(CommentType commentType, ProjectReaction reaction, Comment comment) {
         reaction.decrement(commentType);
 
@@ -248,6 +239,15 @@ public class ProjectService {
         reactionRepository.save(reaction);
         entityManager.flush();
         log.debug("Reaction: {}, {}s were decremented", reaction, commentType.name().toLowerCase());
+    }
+
+    private void updateExistedComment(CommentType commentType, ProjectReaction reaction, Comment comment) {
+        reaction.change(commentType);
+
+        commentService.update(comment, commentType);
+        reactionRepository.save(reaction);
+        entityManager.flush();
+        log.debug("Reaction: {}, {}s were incremented", reaction, commentType.name().toLowerCase());
     }
 
     private void createComment(Integer projectId, Integer userId, CommentType commentType, ProjectReaction reaction) {
