@@ -1,5 +1,6 @@
 package com.alexsitiy.ideas.project.listener;
 
+import com.alexsitiy.ideas.project.event.ProjectCommentDeletedEvent;
 import com.alexsitiy.ideas.project.event.ProjectCommentedEvent;
 import com.alexsitiy.ideas.project.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -11,13 +12,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class OnProjectCommentedListener {
+public class OnProjectCommentDeletedListener {
 
     private final NotificationService notificationService;
 
     @Async
     @EventListener
-    public void createNotificationForUser(ProjectCommentedEvent event) {
-        notificationService.createNotificationOnCommentCreated(event.getProjectId(), event.getCallerId(), event.getCommentType());
+    public void deleteNotification(ProjectCommentDeletedEvent event) {
+        notificationService.deleteNotificationOnCommentDeleted(event.getProjectId(), event.getCallerId());
     }
 }
