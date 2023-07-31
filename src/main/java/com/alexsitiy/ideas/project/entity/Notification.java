@@ -3,15 +3,15 @@ package com.alexsitiy.ideas.project.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Instant;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-@ToString(exclude = {"user","caller","project"})
-@EqualsAndHashCode(exclude = {"user","caller","project"},callSuper = false)
+@ToString(exclude = {"user", "caller", "project"})
+@EqualsAndHashCode(exclude = {"user", "caller", "project"}, callSuper = false)
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 public class Notification extends BasicAuditEntity {
 
     @Id
@@ -20,15 +20,6 @@ public class Notification extends BasicAuditEntity {
 
     @Column(name = "message", nullable = false)
     private String message;
-
-    @Enumerated(EnumType.STRING)
-    private NotificationType type;
-
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
-    @Enumerated(EnumType.STRING)
-    private CommentType comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
@@ -42,8 +33,4 @@ public class Notification extends BasicAuditEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-   public enum NotificationType {
-        STATUS,
-        COMMENT
-    }
 }

@@ -7,6 +7,7 @@ import com.alexsitiy.ideas.project.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +23,18 @@ public class OnProjectEstimationListener {
 
     @Async
     @EventListener
+    @Order(1)
+    public void createNotificationForUser(ProjectEstimationEvent event) {
+        notificationService.createNotificationOnEstimation(event.getProjectId(), event.getCallerId(), event.getStatus());
+    }
+
+    @Async
+    @Order(2)
+    @EventListener
     @Transactional(readOnly = true)
     public void sendStatusNotificationEmailToUser(ProjectEstimationEvent event) {
         projectRepository.findByIdWithUser(event.getProjectId())
                 .ifPresent(emailService::sendStatusNotificationEmail);
-    }
-
-    @Async
-    @EventListener
-    public void createNotificationForUser(ProjectEstimationEvent event) {
-        notificationService.createNotificationOnEstimation(event.getProjectId(),event.getCallerId(),event.getStatus());
     }
 
 }
