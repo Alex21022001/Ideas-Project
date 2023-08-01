@@ -4,6 +4,7 @@ import com.alexsitiy.ideas.project.entity.*;
 import com.alexsitiy.ideas.project.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,5 +116,9 @@ public class NotificationService {
     private String buildMessage(String projectTitle, String action, String firstname, String lastname) {
         return "Your project [%s] was %s by %s %s"
                 .formatted(projectTitle, action, firstname, lastname);
+    }
+
+    public void findAllByUser(Integer id, Pageable pageable) {
+
     }
 }

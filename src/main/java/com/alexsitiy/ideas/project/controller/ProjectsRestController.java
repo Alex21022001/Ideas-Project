@@ -1,17 +1,14 @@
 package com.alexsitiy.ideas.project.controller;
 
 import com.alexsitiy.ideas.project.dto.*;
-import com.alexsitiy.ideas.project.entity.CommentType;
+import com.alexsitiy.ideas.project.dto.sort.ProjectSort;
 import com.alexsitiy.ideas.project.entity.Status;
-import com.alexsitiy.ideas.project.event.ProjectCommentedEvent;
-import com.alexsitiy.ideas.project.event.ProjectEstimationEvent;
 import com.alexsitiy.ideas.project.exception.NoSuchProjectException;
 import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.validation.ContentType;
 import com.alexsitiy.ideas.project.validation.FileCheck;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
