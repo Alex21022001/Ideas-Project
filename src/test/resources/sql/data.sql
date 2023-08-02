@@ -41,11 +41,11 @@ INSERT INTO notification(id, message, created_at, type, status, comment, project
 VALUES (1, 'Your Project: [test2] was rejected by TestExpert TestExpert',
         '2023-07-09 18:36:06.981997', 'STATUS', 'REJECTED', null, 2, 1, 2),
        (2, 'Your Project: [test3] was accepted by TestExpert TestExpert',
-        '2023-07-09 18:36:06.981997', 'STATUS', 'ACCEPTED', null, 3, 2, 2),
+        '2023-07-09 18:37:06.981997', 'STATUS', 'ACCEPTED', null, 3, 2, 2),
        (3, 'Your Project: [test1] was liked by TestExpert TestExpert',
-        '2023-07-09 18:36:06.981997', 'COMMENT', 'LIKE', null, 1, 1, 2),
+        '2023-07-09 18:38:06.981997', 'COMMENT', 'LIKE', null, 1, 1, 2),
        (4, 'Your Project: [test2] was disliked by TestExpert TestExpert',
-        '2023-07-09 18:36:06.981997', 'COMMENT', 'DISLIKE', null, 2, 1, 2),
+        '2023-07-09 18:39:06.981997', 'COMMENT', 'DISLIKE', null, 2, 1, 2),
        (5, 'Your Project: [test3] was disliked by TestExpert TestExpert',
-        '2023-07-09 18:36:06.981997', 'COMMENT', 'DISLIKE', null, 3, 2, 2);
+        '2023-07-09 18:40:06.981997', 'COMMENT', 'DISLIKE', null, 3, 2, 2);
 SELECT setval('notification_id_seq', (SELECT MAX(id) FROM notification));

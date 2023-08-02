@@ -18,6 +18,6 @@ public class NotificationSort extends BasicSort {
 
     @Override
     void addDefaultOrder(List<Order> orders) {
-        orders.add(Order.desc("createAt"));
+        orders.add(Order.desc("createdAt"));
     }
 }

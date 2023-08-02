@@ -1,9 +1,12 @@
 package com.alexsitiy.ideas.project.service;
 
+import com.alexsitiy.ideas.project.dto.NotificationReadDto;
 import com.alexsitiy.ideas.project.entity.*;
+import com.alexsitiy.ideas.project.mapper.NotificationReadMapper;
 import com.alexsitiy.ideas.project.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +24,8 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final StatusNotificationRepository statusNotificationRepository;
     private final CommentNotificationRepository commentNotificationRepository;
+
+    private final NotificationReadMapper notificationReadMapper;
 
     @Transactional
     public void createNotificationOnEstimation(Integer projectId, Integer callerId, Status status) {
@@ -52,7 +57,7 @@ public class NotificationService {
 
     @Transactional
     public void deleteNotificationOnCommentDeleted(Integer projectId, Integer callerId) {
-       commentNotificationRepository.findByProjectIdAndCallerId(projectId, callerId)
+        commentNotificationRepository.findByProjectIdAndCallerId(projectId, callerId)
                 .ifPresent(notification -> {
                     commentNotificationRepository.delete(notification);
                     commentNotificationRepository.flush();
@@ -118,7 +123,8 @@ public class NotificationService {
                 .formatted(projectTitle, action, firstname, lastname);
     }
 
-    public void findAllByUser(Integer id, Pageable pageable) {
-
+    public Page<NotificationReadDto> findAllByUser(Integer id, Pageable pageable) {
+        return notificationRepository.findAllByUserId(id, pageable)
+                .map(notificationReadMapper::map);
     }
 }

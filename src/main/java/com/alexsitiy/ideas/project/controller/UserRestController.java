@@ -1,10 +1,8 @@
 package com.alexsitiy.ideas.project.controller;
 
-import com.alexsitiy.ideas.project.dto.sort.NotificationSort;
 import com.alexsitiy.ideas.project.dto.UserFullReadDto;
 import com.alexsitiy.ideas.project.dto.UserUpdateDto;
 import com.alexsitiy.ideas.project.security.SecurityUser;
-import com.alexsitiy.ideas.project.service.NotificationService;
 import com.alexsitiy.ideas.project.service.UserService;
 import com.alexsitiy.ideas.project.validation.ContentType;
 import com.alexsitiy.ideas.project.validation.FileCheck;
@@ -23,8 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserRestController {
 
     private final UserService userService;
-    private final NotificationService notificationService;
-
 
     @GetMapping("/current")
     public ResponseEntity<UserFullReadDto> getAuthUser(@AuthenticationPrincipal SecurityUser user) {
@@ -42,15 +38,6 @@ public class UserRestController {
                         .contentLength(bytes.length)
                         .body(bytes))
                 .orElseGet(ResponseEntity.notFound()::build);
-    }
-
-    @GetMapping("/notifications")
-    public ResponseEntity<?> getUserNotifications(@AuthenticationPrincipal SecurityUser user,
-                                                  NotificationSort sort) {
-
-        // TODO: 01.08.2023  
-        notificationService.findAllByUser(user.getId(), sort.getPageable());
-        return ResponseEntity.ok().build();
     }
 
     @PutMapping
