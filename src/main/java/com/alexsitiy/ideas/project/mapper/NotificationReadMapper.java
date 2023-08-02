@@ -12,6 +12,7 @@ public class NotificationReadMapper implements Mapper<Notification, Notification
         return new NotificationReadDto(
                 object.getId(),
                 object.getMessage(),
+                object.isStale(),
                 object.getProject().getId(),
                 object.getCaller().getId(),
                 object.getUser().getId()

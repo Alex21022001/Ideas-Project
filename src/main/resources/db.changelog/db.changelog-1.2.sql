@@ -6,6 +6,7 @@ CREATE TABLE notification
     id         serial PRIMARY KEY,
     message    varchar(256)                                  NOT NULL,
     created_at timestamp                                     NOT NULL,
+    stale      bool                                          NOT NULL,
     type       varchar(32)                                   NOT NULL,
     status     varchar(32),
     comment    varchar(32),

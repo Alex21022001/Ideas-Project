@@ -1,5 +1,6 @@
 package com.alexsitiy.ideas.project.entity;
 
+import com.alexsitiy.ideas.project.listener.NotificationDefaultListener;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +13,7 @@ import lombok.*;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+@EntityListeners({NotificationDefaultListener.class})
 public class Notification extends BasicAuditEntity {
 
     @Id
@@ -20,6 +22,9 @@ public class Notification extends BasicAuditEntity {
 
     @Column(name = "message", nullable = false)
     private String message;
+
+    @Column(name = "stale", nullable = false)
+    private boolean stale;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")

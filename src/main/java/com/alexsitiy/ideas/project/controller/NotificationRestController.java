@@ -9,9 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,5 +26,12 @@ public class NotificationRestController {
 
         Page<NotificationReadDto> notifications = notificationService.findAllByUser(user.getId(), sort.getPageable());
         return ResponseEntity.ok(PageResponse.of(notifications));
+    }
+
+    @PostMapping("/user")
+    public ResponseEntity<?> makeNotificationsStale(@RequestBody List<Integer> ids,@AuthenticationPrincipal SecurityUser user) {
+
+        notificationService.makeNotificationsStale(ids,user.getId());
+        return ResponseEntity.noContent().build();
     }
 }

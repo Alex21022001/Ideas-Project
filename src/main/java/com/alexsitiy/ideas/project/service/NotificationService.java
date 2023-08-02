@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -78,6 +79,12 @@ public class NotificationService {
                         throw new IllegalArgumentException();
                     }
                 }).orElseThrow();
+    }
+
+    @Transactional
+    public void makeNotificationsStale(List<Integer> ids, Integer userId) {
+        int count = notificationRepository.makeNotificationsStale(ids, userId);
+        log.debug("{} notifications made deprecated", count);
     }
 
     private StatusNotification createStatusNotification(User user, Project project, User caller, Status status) {
