@@ -1,6 +1,5 @@
 package com.alexsitiy.ideas.project.schedule;
 
-import com.alexsitiy.ideas.project.entity.Notification;
 import com.alexsitiy.ideas.project.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class NotificationDeleteSchedule {
+public class NotificationDeleteScheduler {
 
     private final NotificationRepository notificationRepository;
 
