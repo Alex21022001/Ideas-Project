@@ -41,7 +41,6 @@ jwt:
   secret: "eyJhbGciOiJI"
   longevity: 180
 
-
 aws:
   access:
     key:

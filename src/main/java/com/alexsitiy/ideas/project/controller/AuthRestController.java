@@ -6,6 +6,7 @@ import com.alexsitiy.ideas.project.security.AuthenticationRequest;
 import com.alexsitiy.ideas.project.security.RegisterRequest;
 import com.alexsitiy.ideas.project.security.AuthenticationResponse;
 import com.alexsitiy.ideas.project.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,9 @@ public class AuthRestController {
 
     private final AuthService authService;
 
+
     @PostMapping("/register")
+    @Operation(summary = "Register a new User with given credentials")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody @Validated RegisterRequest request) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -28,6 +31,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Authenticate already existed User by given credentials")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody @Validated AuthenticationRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }

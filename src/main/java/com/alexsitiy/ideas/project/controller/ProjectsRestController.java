@@ -8,6 +8,7 @@ import com.alexsitiy.ideas.project.security.SecurityUser;
 import com.alexsitiy.ideas.project.service.ProjectService;
 import com.alexsitiy.ideas.project.validation.ContentType;
 import com.alexsitiy.ideas.project.validation.FileCheck;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +32,7 @@ public class ProjectsRestController {
 
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get a Project by given ID")
     public ResponseEntity<ProjectReadDto> findById(@PathVariable Integer id) {
         return projectService.findById(id)
                 .map(ResponseEntity::ok)
@@ -38,6 +40,7 @@ public class ProjectsRestController {
     }
 
     @GetMapping
+    @Operation(summary = "Get all Projects with sort and pagination")
     public ResponseEntity<PageResponse<ProjectReadDto>> findAll(ProjectFilter filter,
                                                                 ProjectSort projectSort) {
 
@@ -47,6 +50,7 @@ public class ProjectsRestController {
     }
 
     @GetMapping("/user")
+    @Operation(summary = "Get all Projects created by an authenticated User with sort and pagination")
     public ResponseEntity<PageResponse<ProjectReadDto>> findAllByUser(@AuthenticationPrincipal SecurityUser user,
                                                                       ProjectSort sort) {
 
@@ -56,6 +60,7 @@ public class ProjectsRestController {
     }
 
     @GetMapping("/user/liked")
+    @Operation(summary = "Get all Projects liked by an authenticated User with sort and pagination")
     public ResponseEntity<PageResponse<ProjectReadDto>> findAllLikedProjectsByUser(@AuthenticationPrincipal SecurityUser user,
                                                                                    ProjectSort sort) {
 
@@ -65,6 +70,7 @@ public class ProjectsRestController {
     }
 
     @GetMapping("/user/disliked")
+    @Operation(summary = "Get all Projects disliked by an authenticated User with sort and pagination")
     public ResponseEntity<PageResponse<ProjectReadDto>> findAllDislikedProjectsByUser(@AuthenticationPrincipal SecurityUser user,
                                                                                       ProjectSort sort) {
 
@@ -74,6 +80,7 @@ public class ProjectsRestController {
     }
 
     @GetMapping("/user/history")
+    @Operation(summary = "Get all ProjectHistory for an authenticated User")
     public ResponseEntity<PageResponse<ProjectHistoryDto>> findAllProjectHistoryByUser(@AuthenticationPrincipal
                                                                                        SecurityUser user,
                                                                                        Pageable pageable) {
@@ -85,6 +92,7 @@ public class ProjectsRestController {
     }
 
     @GetMapping("/expert/accepted")
+    @Operation(summary = "Get all Projects accepted by an authenticated Expert")
     public ResponseEntity<PageResponse<ProjectReadDto>> findAllAcceptedByExpert(@AuthenticationPrincipal
                                                                                 SecurityUser user,
                                                                                 ProjectSort sort) {
@@ -94,6 +102,7 @@ public class ProjectsRestController {
     }
 
     @GetMapping("/expert/rejected")
+    @Operation(summary = "Get all Projects rejected by an authenticated Expert")
     public ResponseEntity<PageResponse<ProjectReadDto>> findAllRejectedByExpert(@AuthenticationPrincipal
                                                                                 SecurityUser user,
                                                                                 ProjectSort sort) {
@@ -103,6 +112,7 @@ public class ProjectsRestController {
     }
 
     @PostMapping
+    @Operation(summary = "Create Project")
     public ResponseEntity<ProjectReadDto> create(@Validated ProjectCreateDto projectCreateDto,
                                                  @AuthenticationPrincipal SecurityUser user) {
 
@@ -112,6 +122,7 @@ public class ProjectsRestController {
     }
 
     @GetMapping("/{id}/image")
+    @Operation(summary = "Get Project's image by Project ID")
     public ResponseEntity<byte[]> getImage(@PathVariable Integer id) {
         return projectService.downloadImage(id)
                 .map(bytes -> ResponseEntity
@@ -123,6 +134,7 @@ public class ProjectsRestController {
     }
 
     @GetMapping("/{id}/doc")
+    @Operation(summary = "Get Project's doc by Project ID")
     public ResponseEntity<byte[]> getDoc(@PathVariable Integer id) {
         return projectService.downloadDoc(id)
                 .map(bytes -> ResponseEntity
@@ -135,6 +147,7 @@ public class ProjectsRestController {
 
     @PutMapping("/{id}")
     @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
+    @Operation(summary = "Update a Project by Project ID")
     public ResponseEntity<ProjectReadDto> update(@PathVariable("id") Integer id,
                                                  @Validated @RequestBody ProjectUpdateDto projectUpdateDto) {
 
@@ -145,6 +158,7 @@ public class ProjectsRestController {
 
     @PutMapping("/{id}/image")
     @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
+    @Operation(summary = "Update Project's image by Project ID")
     public ResponseEntity<?> updateImage(@PathVariable("id") Integer id,
                                          @RequestParam("image")
                                          @FileCheck(nullable = false, contentType = {
@@ -157,6 +171,7 @@ public class ProjectsRestController {
 
     @PutMapping("/{id}/doc")
     @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
+    @Operation(summary = "Update Project's doc by Project ID")
     public ResponseEntity<?> updateDoc(@PathVariable("id") Integer id,
                                        @RequestParam("doc")
                                        @FileCheck(nullable = false, contentType = {ContentType.APPLICATION_PDF_VALUE})
@@ -166,15 +181,8 @@ public class ProjectsRestController {
         return ResponseEntity.status(HttpStatus.RESET_CONTENT).build();
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
-    public ResponseEntity<?> delete(@PathVariable("id") Integer id) {
-
-        return projectService.delete(id) ?
-                ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
-    }
-
     @PostMapping("/{id}/like")
+    @Operation(summary = "Like a Project by Project ID")
     public ResponseEntity<?> likeProject(@PathVariable Integer id,
                                          @AuthenticationPrincipal SecurityUser user) {
         projectService.likeProject(id, user.getId());
@@ -183,6 +191,7 @@ public class ProjectsRestController {
     }
 
     @PostMapping("/{id}/dislike")
+    @Operation(summary = "Dislike a Project by Project ID")
     public ResponseEntity<?> dislikeProject(@PathVariable Integer id,
                                             @AuthenticationPrincipal SecurityUser user) {
         projectService.dislikeProject(id, user.getId());
@@ -191,6 +200,7 @@ public class ProjectsRestController {
     }
 
     @PostMapping("/{id}/accept")
+    @Operation(summary = "Accept a Project by Project ID")
     public ResponseEntity<?> acceptProject(@PathVariable Integer id,
                                            @AuthenticationPrincipal SecurityUser user) {
         projectService.acceptProject(id, user.getId());
@@ -199,11 +209,21 @@ public class ProjectsRestController {
     }
 
     @PostMapping("/{id}/reject")
+    @Operation(summary = "Reject a Project by Project ID")
     public ResponseEntity<?> rejectProject(@PathVariable Integer id,
                                            @AuthenticationPrincipal SecurityUser user) {
         projectService.rejectProject(id, user.getId());
 
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@securityService.verifyUserForProject(#id,authentication)")
+    @Operation(summary = "Delete a Project by Project ID")
+    public ResponseEntity<?> delete(@PathVariable("id") Integer id) {
+
+        return projectService.delete(id) ?
+                ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(NoSuchProjectException.class)
