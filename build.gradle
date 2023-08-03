@@ -79,6 +79,7 @@ jacocoTestCoverageVerification {
     }
 }
 task openJacocoReport(type: Exec) {
+    dependsOn test
     group 'verification'
     commandLine 'cmd', '/c', 'start', '', project.file('build/reports/jacoco/test/html/index.html').toString()
 }
