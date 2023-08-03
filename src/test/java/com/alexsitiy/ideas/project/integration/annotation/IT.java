@@ -1,7 +1,7 @@
 package com.alexsitiy.ideas.project.integration.annotation;
 
 
-import com.alexsitiy.ideas.project.integration.TestSpringSecurityApplication;
+import com.alexsitiy.ideas.project.integration.IdeasProjectTestApp;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +15,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ActiveProfiles("test")
 @Transactional
-@SpringBootTest(classes = TestSpringSecurityApplication.class)
+@SpringBootTest(classes = IdeasProjectTestApp.class)
 public @interface IT {
 }

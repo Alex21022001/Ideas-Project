@@ -31,21 +31,73 @@ In addition to the features available to regular users, experts have the followi
 
 - **View Evaluation Metrics:** Accessing and organizing a list of ideas they have evaluated based on specific metrics empowers experts to make informed decisions.
 ## Technology Stack
+The "Ideas Project" is built using the following technology stack:
 
-- Spring Boot (with various starters: data JPA, mail, security, web, validation)
-- QueryDSL for JPA querying
-- Spring Data Envers for audit history tracking
-- PostgreSQL database
-- Liquibase for database versioning
-- Amazon S3 SDK for file storage (e.g., PDF documents)
+- **Spring Boot:** The core framework for building the application.
+    - [spring-boot-starter-data-jpa](https://spring.io/projects/spring-boot#learn)
+    - [spring-boot-starter-mail](https://spring.io/projects/spring-boot#learn)
+    - [spring-boot-starter-security](https://spring.io/projects/spring-boot#learn)
+    - [spring-boot-starter-web](https://spring.io/projects/spring-boot#learn)
+    - [spring-boot-starter-validation](https://spring.io/projects/spring-boot#learn)
 
-## API Documentation
+- **QueryDSL:** A powerful library for type-safe querying and manipulation of JPA entities.
+    - [querydsl-jpa](https://querydsl.com/)
+    - [querydsl-apt](https://querydsl.com/)
 
-[Link to detailed API documentation or explain how users can access the API endpoints]
+- **Spring Data Envers:** Enables auditing of entities using Hibernate Envers for versioning and history tracking.
+    - [spring-data-envers](https://spring.io/projects/spring-data#envers)
+
+- **Database:**
+    - [PostgreSQL](https://www.postgresql.org/): A robust and feature-rich relational database.
+    - [Liquibase](https://www.liquibase.org/): A database schema version control and migration tool.
+  
+- **API Documentation:**
+    - [Springdoc OpenAPI](https://springdoc.org/): Provides automated OpenAPI documentation and UI for the API.
+        - [springdoc-openapi-starter-webmvc-ui](https://springdoc.org/#actuator-and-springdoc-openapi-ui): The OpenAPI UI starter for Spring WebMVC.
+
+- **Amazon S3 SDK:** A software development kit for Amazon S3, enabling file storage capabilities (e.g., PDF documents).
+    - [software.amazon.awssdk:s3-transfer-manager](https://aws.amazon.com/sdk-for-java/)
+
+- **Auth0 Java JWT:** A library for parsing and validating JWT tokens.
+    - [com.auth0:java-jwt](https://github.com/auth0/java-jwt)
+
+- **Testing Frameworks:**
+    - [JUnit 5](https://junit.org/junit5/): A popular testing framework for Java.
+    - [Mockito](https://site.mockito.org/): A mocking framework for unit testing.
+    - [Testcontainers](https://www.testcontainers.org/): Enables easy integration testing using real database instances.
+
+## Database Schema
+
+Below is the database schema used in the "Ideas Project" application:
+
+![Database Schema](path/to/your/database_schema.png)
 
 ## Testing
 
-To run tests, use the following command: `./gradlew test`
+Testing is a critical aspect of the "Ideas Project" to ensure the reliability and stability of the application. I have implemented various levels of tests to cover different parts of the codebase.
+
+### Test Coverage
+
+Test suite has achieved a test coverage of **`76%`**, as depicted in the following image:
+
+![img_5.png](img_5.png)
+
+### Test Levels
+
+1. **Unit Tests:** I have added unit tests that focus on testing individual components and functions in isolation. These tests help verify the correctness of critical algorithms and functionalities.
+
+2. **Integration Tests:** Integration tests validate the interaction between different components and modules to ensure they work harmoniously together.
+
+## API Documentation
+The API documentation is generated using Swagger and provides an interactive UI to explore the endpoints and their functionality. Below are some images of the API documentation:
+
+![img_1.png](img_1.png)
+![img.png](img.png)
+![img_2.png](img_2.png)
+![img_3.png](img_3.png)
+![img_4.png](img_4.png)
+To access the live API documentation, run the application and navigate to the following URL:
+http://localhost:8080/swagger-ui/index.html
 
 ## Installation
 
