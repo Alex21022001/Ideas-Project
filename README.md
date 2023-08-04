@@ -70,7 +70,7 @@ The "Ideas Project" is built using the following technology stack:
 
 Below is the database schema used in the "Ideas Project" application:
 
-![Database Schema](path/to/your/database_schema.png)
+![img_6.png](img_6.png)
 
 ## Testing
 

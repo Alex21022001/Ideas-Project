@@ -5,15 +5,13 @@ app:
     subject: "[IdeaProjects Team]"
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/postgres
-    username: postgres
-    password: alex21022001
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     properties:
       hibernate:
-        show_sql: true
-        format_sql: true
         hbm2ddl:
           auto: validate
     open-in-view: false
@@ -27,8 +25,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: alexeysitiy@gmail.com
-    password: arqkmemdnnyabqge
+    username: ${MAIL_EMAIL}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -38,26 +36,21 @@ spring:
 jwt:
   subject: "Username"
   issuer: "Ideas project"
-  secret: "eyJhbGciOiJI"
+  secret: ${JWT_SECRET}
   longevity: 180
 
 aws:
   access:
     key:
-      id: AKIATAVZMCPH4DPJRWQP
+      id: ${AWS_ID}
   secret:
     access:
-      key: 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
+      key: ${AWS_KEY}
   s3:
     region: eu-central-1
     bucket:
-      name: springimagebucket
+      name: ${AWS_BUCKET}
     projects-url: projects/
     users-url: users/
-
-logging:
-  level:
-    root: info
-    com.alexsitiy.ideas.project: debug
 
 

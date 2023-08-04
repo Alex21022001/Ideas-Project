@@ -1,1 +1,20 @@
-
+aws:
+  access:
+    key:
+      id: testid
+  secret:
+    access:
+      key: testkey
+  s3:
+    region: eu-central-1
+    bucket:
+      name: testbucket
+logging:
+  level:
+    com.alexsitiy.ideas.project: debug
+spring:
+  mail:
+    username: test@gmail.com
+    password: testpass
+jwt:
+  secret: some-secret

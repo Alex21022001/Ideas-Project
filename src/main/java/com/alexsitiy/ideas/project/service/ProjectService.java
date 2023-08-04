@@ -29,6 +29,7 @@ import java.util.Optional;
 
 import static com.alexsitiy.ideas.project.entity.QProject.project;
 
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
