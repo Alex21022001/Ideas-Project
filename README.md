@@ -1,7 +1,5 @@
 # Ideas Project
 
-![Build Status](https://travis-ci.org/[your-username]/[your-repo].svg?branch=master)
-
 ## Description
 
 "Ideas Project" is a web application where users can create an account, suggest their own ideas, and publish them for others to explore. Users can like or dislike ideas, and the creators receive notifications for these interactions. Additionally, the platform has a special type of user called "Experts" who can evaluate the appropriateness of ideas. When an idea is evaluated, the creator is notified via email and within the application.
@@ -70,7 +68,7 @@ The "Ideas Project" is built using the following technology stack:
 
 Below is the database schema used in the "Ideas Project" application:
 
-![img_6.png](img_6.png)
+![img_6.png](images/img_6.png)
 
 ## Testing
 
@@ -80,7 +78,7 @@ Testing is a critical aspect of the "Ideas Project" to ensure the reliability an
 
 Test suite has achieved a test coverage of **`76%`**, as depicted in the following image:
 
-![img_5.png](img_5.png)
+![img_5.png](images/img_5.png)
 
 ### Test Levels
 
@@ -91,17 +89,69 @@ Test suite has achieved a test coverage of **`76%`**, as depicted in the followi
 ## API Documentation
 The API documentation is generated using Swagger and provides an interactive UI to explore the endpoints and their functionality. Below are some images of the API documentation:
 
-![img_1.png](img_1.png)
-![img.png](img.png)
-![img_2.png](img_2.png)
-![img_3.png](img_3.png)
-![img_4.png](img_4.png)
+![img_1.png](images/img_1.png)
+![img.png](images/img.png)
+![img_2.png](images/img_2.png)
+![img_3.png](images/img_3.png)
+![img_4.png](images/img_4.png)
 To access the live API documentation, run the application and navigate to the following URL:
 http://localhost:8080/swagger-ui/index.html
 
+### Using Postman for API Testing
+
+You can also use Postman, a popular API testing tool, to interact with the "Ideas Project" API. I have created a public Postman workspace that contains a collection of requests for testing various endpoints and scenarios.
+
+To access the Postman workspace:
+
+1. Open Postman and log in (or create an account if you don't have one).
+2. Navigate to the following link: 
+<div style="text-align:left">
+<a href="https://www.postman.com/mission-specialist-29542612/workspace/ideas-project" target="_blank" style="background-color:#FF6C37; color:white; padding:10px 10px; border-radius:5px; text-decoration:none; font-weight:bold;">Open Postman Workspace</a>
+</div>
+
+3. In the workspace, you will find a collection with pre-configured requests. Click the "Run in Postman" button to import the collection into your Postman application.
+4. Once imported, you can start testing the API endpoints using the provided requests. Make sure to adjust the request parameters as needed.
+
+Using Postman can provide a convenient way to explore and test the API's functionality beyond what is offered by the Swagger UI.
+
+
 ## Installation
 
-1. Clone this repository.
-2. [Provide instructions on how to set up the database and other configurations]
-3. Build the project using Gradle: `./gradlew build`
-4. Run the application: `./gradlew bootRun`
+To get the "Ideas Project" up and running on your local machine, follow these steps:
+
+### 1. Build the JAR File
+
+First, you need to build the JAR file of the application using the provided Gradle task:
+
+```bash
+./gradlew jarBuild
+```
+### 2. Configure Environment Variables
+
+Before running the application using Docker Compose, you need to specify some environment variables. These variables are stored in a .env file located in the root directory of the project.
+Edit the `.env` file and provide appropriate values for the following properties:
+
+#**The app will work if you don't specify the following properties, but functions Project.create,accept,reject will throw exceptions**
+1. MAIL_EMAIL=your_email
+2. MAIL_PASSWORD=your_email_password
+3. JWT_SECRET=some_secret
+4. AWS_ID=your_s3_access_id
+5. AWS_KEY=your_s3_access_key
+6. AWS_BUCKET=your_s3_bucket_name
+
+### 3. Run with Docker Compose
+
+Now that you have built the JAR file and configured the environment variables, you can use Docker Compose to set up and run the application and database:
+```bash
+docker-compose up -d --build
+```
+This command will start the application and the associated PostgreSQL database in detached mode. Docker Compose will use the configuration specified in the docker-compose.yml file.
+
+### 4. Access the Application
+
+1. Once the containers are up and running, you can access the "Ideas Project" application by navigating to:
+   http://localhost:8080.
+2. Also, you can use Swagger in order to test API, go to this address:
+   http://localhost:8080/swagger-ui/index.html
+3. Or use already prepared Postman collection to test API:
+   https://www.postman.com/mission-specialist-29542612/workspace/ideas-project
