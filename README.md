@@ -58,6 +58,7 @@ The "Ideas Project" is built using the following technology stack:
 
 - **Auth0 Java JWT:** A library for parsing and validating JWT tokens.
     - [com.auth0:java-jwt](https://github.com/auth0/java-jwt)
+- **Docker:** A platform for containerizing and deploying applications, providing consistency across development and production environments.
 
 - **Testing Frameworks:**
     - [JUnit 5](https://junit.org/junit5/): A popular testing framework for Java.
